@@ -19,6 +19,6 @@ public class CommonCodeDetailEntity {
     private String codeDetailName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "code_id")
     private CommonCodeEntity commonCode;
 }

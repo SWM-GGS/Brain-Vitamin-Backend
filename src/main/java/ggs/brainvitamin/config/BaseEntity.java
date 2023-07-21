@@ -19,6 +19,6 @@ public class BaseEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    private CommonCodeDetailEntity commonCodeDetail;
+    @JoinColumn(name = "status")
+    private CommonCodeDetailEntity status;
 }
