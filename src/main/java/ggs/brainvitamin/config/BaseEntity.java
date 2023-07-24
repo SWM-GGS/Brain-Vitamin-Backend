@@ -20,5 +20,5 @@ public class BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status")
-    private CommonCodeDetailEntity status;
+    private CommonCodeDetailEntity statusCode;
 }

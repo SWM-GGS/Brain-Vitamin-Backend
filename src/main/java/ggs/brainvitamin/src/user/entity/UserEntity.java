@@ -4,23 +4,27 @@ import ggs.brainvitamin.config.BaseEntity;
 import ggs.brainvitamin.config.CommonCodeDetailEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
-@Table(name = "User")
+@Table(name = "USER")
+@NoArgsConstructor
+@DynamicInsert
 public class UserEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Long id;
 
-    @Column(nullable = false, name = "user_type")
-    private Long userType;
+    @JoinColumn(name = "user_type")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CommonCodeDetailEntity userTypeCode;
 
-    @JoinColumn(nullable = false, name = "education")
+    @JoinColumn(name = "education")
     @ManyToOne(fetch = FetchType.LAZY)
     private CommonCodeDetailEntity educationCode;
 
@@ -46,5 +50,5 @@ public class UserEntity extends BaseEntity {
     private int fontSize;
 
     @Column(nullable = false, name = "profile_img")
-    private String profileImg;
+    private String profileImgUrl;
 }
