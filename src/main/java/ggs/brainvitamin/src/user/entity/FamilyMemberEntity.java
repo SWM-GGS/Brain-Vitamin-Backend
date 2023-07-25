@@ -16,6 +16,7 @@ public class FamilyMemberEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @JoinColumn(name = "family_id")

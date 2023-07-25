@@ -15,6 +15,7 @@ public class PostReportEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @JoinColumn(name = "post_id")

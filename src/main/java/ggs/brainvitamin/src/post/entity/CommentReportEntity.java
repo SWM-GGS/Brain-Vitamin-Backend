@@ -15,6 +15,7 @@ public class CommentReportEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @JoinColumn(name = "comment_id")

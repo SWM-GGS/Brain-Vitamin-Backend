@@ -17,6 +17,7 @@ public class PostImgInfoEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @JoinColumn(name = "img_id")

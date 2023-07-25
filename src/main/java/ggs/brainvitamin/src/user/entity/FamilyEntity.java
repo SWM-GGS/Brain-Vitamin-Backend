@@ -16,6 +16,7 @@ public class FamilyEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @Column(nullable = false, name = "profile_img")

@@ -14,6 +14,7 @@ public class TagCountEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @Column(nullable = false, name = "popular_tag1")
