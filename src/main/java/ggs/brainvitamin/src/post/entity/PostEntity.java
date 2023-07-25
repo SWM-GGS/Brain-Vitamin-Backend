@@ -29,8 +29,7 @@ public class PostEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private CommonCodeDetailEntity postTypeCode;
 
-    @JoinColumn(name = "family_id")
-    @ColumnDefault("0")
+    @JoinColumn(name = "family_id", columnDefinition = "INT UNSIGNED default 0 NOT NULL")
     @ManyToOne(fetch = FetchType.LAZY)
     private FamilyEntity family;
 
