@@ -29,8 +29,7 @@ public class CommentEntity extends BaseEntity {
     @Column(nullable = false)
     private String contents;
 
-    @Column(nullable = false, name = "parents_id")
-    @ColumnDefault("0")
+    @Column(name = "parents_id", columnDefinition = "INT UNSIGNED default 0 NOT NULL")
     private Long parentsId;
 }
 
