@@ -1,4 +1,4 @@
-package ggs.brainvitamin.src.user.repository;
+package ggs.brainvitamin.src.post.repository;
 
 import ggs.brainvitamin.src.post.entity.CommentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

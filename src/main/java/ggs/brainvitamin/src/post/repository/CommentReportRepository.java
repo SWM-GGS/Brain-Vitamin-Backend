@@ -1,10 +1,9 @@
-package ggs.brainvitamin.src.user.repository;
+package ggs.brainvitamin.src.post.repository;
 
 import ggs.brainvitamin.src.post.entity.CommentReportEntity;
-import ggs.brainvitamin.src.post.entity.EmotionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EmotionRepository extends JpaRepository<EmotionEntity, Long> {
+public interface CommentReportRepository extends JpaRepository<CommentReportEntity, Long> {
 }
