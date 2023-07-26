@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "pool_SF")
+@Table(name = "poolSf")
 @NoArgsConstructor
 public class PoolSfEntity extends BaseEntity {
 

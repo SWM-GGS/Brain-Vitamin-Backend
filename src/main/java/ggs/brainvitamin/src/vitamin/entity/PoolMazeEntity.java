@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@Table(name = "pool_MAZE")
+@Table(name = "poolMaze")
 @NoArgsConstructor
 public class PoolMazeEntity extends BaseEntity {
 
@@ -29,7 +29,7 @@ public class PoolMazeEntity extends BaseEntity {
     @Column(nullable = false)
     private Integer difficulty;
 
-    @OneToMany(mappedBy = "pool_maze", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "poolMaze", cascade = CascadeType.ALL)
     private List<PoolMazeDetailEntity> poolMazeDetails = new ArrayList<>();
 
 }

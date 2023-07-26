@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "pool_MAZE_detail")
+@Table(name = "poolMazeDetail")
 @NoArgsConstructor
 public class PoolMazeDetailEntity {
 
