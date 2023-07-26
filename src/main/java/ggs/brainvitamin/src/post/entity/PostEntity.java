@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Table(name = "POST")
@@ -48,4 +50,10 @@ public class PostEntity extends BaseEntity {
 
     @Column(nullable = false, name = "viewers_count")
     private Long viewersCount;
+
+    @OneToMany(mappedBy = "POST", cascade = CascadeType.ALL)
+    private List<PostImgEntity> postImgEntityList;
+
+    @OneToMany(mappedBy = "POST", cascade = CascadeType.ALL)
+    private List<CommentEntity> commentEntityList;
 }
