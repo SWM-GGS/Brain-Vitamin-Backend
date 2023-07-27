@@ -1,5 +1,6 @@
 package ggs.brainvitamin.config;
 
+import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;

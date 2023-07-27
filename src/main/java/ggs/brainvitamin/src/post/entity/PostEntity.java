@@ -1,13 +1,12 @@
 package ggs.brainvitamin.src.post.entity;
 
 import ggs.brainvitamin.config.BaseEntity;
-import ggs.brainvitamin.config.CommonCodeDetailEntity;
+import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.user.entity.FamilyEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package ggs.brainvitamin.src.user.entity;
 
 import ggs.brainvitamin.config.BaseEntity;
-import ggs.brainvitamin.config.CommonCodeDetailEntity;
+import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package ggs.brainvitamin.config;
+package ggs.brainvitamin.src.common.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
