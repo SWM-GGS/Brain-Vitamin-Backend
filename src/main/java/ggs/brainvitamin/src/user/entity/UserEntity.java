@@ -52,4 +52,13 @@ public class UserEntity extends BaseEntity {
 
     @Column(columnDefinition = "INT UNSIGNED default 0 NOT NULL")
     private Integer consecutiveDays;
+
+    /**
+     * 비즈니스 코드
+     */
+    public void addPatientDetails(LocalDate birthDate, String gender, CommonCodeDetailEntity educationCode) {
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.educationCode = educationCode;
+    }
 }
