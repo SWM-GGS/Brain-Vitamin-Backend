@@ -21,7 +21,7 @@ public class UserEntity extends BaseEntity {
     @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
-    @JoinColumn(name = "user_type")
+    @JoinColumn(nullable = false, name = "user_type")
     @ManyToOne(fetch = FetchType.LAZY)
     private CommonCodeDetailEntity userTypeCode;
 
@@ -35,21 +35,18 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String nickname;
 
-    @Column(nullable = false)
-    private int age;
-
     @Column(nullable = false, name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false, name = "birth_date")
+    @Column(name = "birth_date")
     private LocalDate birthDate;
 
     @Column(nullable = false)
     private String gender;
 
     @Column(nullable = false, name = "font_size")
-    private int fontSize;
+    private Integer fontSize;
 
-    @Column(nullable = false, name = "profile_img")
+    @Column(name = "profile_img")
     private String profileImgUrl;
 }

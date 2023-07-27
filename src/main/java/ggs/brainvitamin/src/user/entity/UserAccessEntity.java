@@ -17,7 +17,7 @@ public class UserAccessEntity extends BaseEntity {
     @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(nullable = false, name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 }
