@@ -2,7 +2,7 @@ package ggs.brainvitamin.src.post.patient.controller;
 
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
-import ggs.brainvitamin.src.post.patient.dto.PostDto;
+import ggs.brainvitamin.src.post.patient.dto.PostDetailDto;
 import ggs.brainvitamin.src.post.patient.dto.PostMainDto;
 import ggs.brainvitamin.src.post.patient.service.PatientPostService;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +29,13 @@ public class PatientPostController {
         }
     }
 
-//    @GetMapping("/{familyId}/{postId}")
-//    public BaseResponse<PostDto> getFamilyStoriesPost(@PathVariable("postId") Long postId) {
-//        try {
-//            return BaseResponse<>(patientPostService.findFamilyStoriesPost(postId));
-//        } catch (BaseException e) {
-//            return new BaseResponse<>(e.getStatus());
-//        }
-//    }
+    @GetMapping("/{familyId}/{postId}")
+    public BaseResponse<PostDetailDto> getFamilyStoriesPost(@PathVariable("postId") Long postId) {
+        try {
+            return new BaseResponse<>(patientPostService.getFamilyStoriesPost(postId));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }
 
