@@ -41,16 +41,16 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false, name = "birth_date")
+    @Column(nullable = true, name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String gender;
 
     @Column(nullable = false, name = "font_size")
     private int fontSize;
 
-    @Column(nullable = false, name = "profile_img")
+    @Column(nullable = true, name = "profile_img")
     private String profileImgUrl;
 
     @Column(columnDefinition = "INT UNSIGNED default 0 NOT NULL")
