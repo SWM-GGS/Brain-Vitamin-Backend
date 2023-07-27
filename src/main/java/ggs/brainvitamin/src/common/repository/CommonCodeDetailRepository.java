@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommonCodeDetailRepository extends JpaRepository<CommonCodeDetailEntity, Long> {
+    CommonCodeDetailEntity findCommonCodeDetailEntityByCodeDetailName(String codeDetailName);
 }

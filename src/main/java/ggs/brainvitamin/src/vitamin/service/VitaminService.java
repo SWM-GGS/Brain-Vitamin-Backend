@@ -1,15 +1,20 @@
 package ggs.brainvitamin.src.vitamin.service;
 
 import ggs.brainvitamin.config.BaseException;
+import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
+import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.repository.UserRepository;
-import ggs.brainvitamin.src.vitamin.dto.GetPatientHomeDto;
+import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
+import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.entity.ScreeningTestHistoryEntity;
 import ggs.brainvitamin.src.vitamin.repository.ScreeningTestHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -21,6 +26,7 @@ public class VitaminService {
 
     private final UserRepository userRepository;
     private final ScreeningTestHistoryRepository screeningTestHistoryRepository;
+    private final CommonCodeDetailRepository commonCodeDetailRepository;
 
 
     public GetPatientHomeDto getPatientHome(Long userId) {
@@ -67,4 +73,22 @@ public class VitaminService {
         return getPatientHomeDto;
     }
 
+    public void setUserDetails(Long userId, PostUserDetailDto postUserDetailDto) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        if (userEntity.getStatusCode().getCodeDetail().equals("ACTI02")) {
+            throw new BaseException(NOT_ACTIVATED_USER);
+        }
+
+        String birthDate = postUserDetailDto.getBirthDate().substring(0, 4) + "-" +
+                postUserDetailDto.getBirthDate().substring(4, 6) + "-" + postUserDetailDto.getBirthDate().substring(6, 8);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(birthDate, formatter);
+
+        CommonCodeDetailEntity commonCodeDetailEntity = commonCodeDetailRepository.findCommonCodeDetailEntityByCodeDetailName(postUserDetailDto.getEducation());
+
+        userEntity.addPatientDetails(date, postUserDetailDto.getGender(), commonCodeDetailEntity);
+        userRepository.save(userEntity);
+    }
 }
