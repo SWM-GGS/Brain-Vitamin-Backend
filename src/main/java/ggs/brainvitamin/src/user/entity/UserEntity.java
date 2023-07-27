@@ -52,4 +52,7 @@ public class UserEntity extends BaseEntity {
 
     @Column(nullable = false, name = "profile_img")
     private String profileImgUrl;
+
+    @Column(columnDefinition = "INT UNSIGNED default 0 NOT NULL")
+    private Integer consecutiveDays;
 }
