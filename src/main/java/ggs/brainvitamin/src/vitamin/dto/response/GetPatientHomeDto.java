@@ -1,4 +1,4 @@
-package ggs.brainvitamin.src.vitamin.dto;
+package ggs.brainvitamin.src.vitamin.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
