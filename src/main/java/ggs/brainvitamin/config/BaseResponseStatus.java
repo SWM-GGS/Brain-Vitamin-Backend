@@ -82,6 +82,8 @@ public enum BaseResponseStatus {
 
     FAILED_TO_LOGIN(false,3010,"없는 아이디이거나 비밀번호가 틀렸습니다."),
 
+    NOT_ACTIVATED_USER(false,3020,"유효한 사용자가 아닙니다."),
+
 
     /**
      * 4000 : Database, Server 오류
