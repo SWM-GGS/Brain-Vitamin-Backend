@@ -2,8 +2,10 @@ package ggs.brainvitamin.src.vitamin.controller;
 
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
+import ggs.brainvitamin.src.vitamin.dto.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.dto.MarketDto;
 import ggs.brainvitamin.src.vitamin.dto.MazeDto;
+import ggs.brainvitamin.src.vitamin.service.VitaminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,9 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/vitamins")
+@RequestMapping("/patient")
 @RequiredArgsConstructor
-public class vitaminController {
+public class VitaminController {
+
+    private final VitaminService vitaminService;
 
     @GetMapping("/maze")
     public BaseResponse<MazeDto> getMaze() {
@@ -44,7 +48,17 @@ public class vitaminController {
         }
     }
 
+    @GetMapping("")
+    public BaseResponse<GetPatientHomeDto> getPatientHome() {
+        try {
+            Long userId = 1L;
+            GetPatientHomeDto getPatientHomeDto = vitaminService.getPatientHome(userId);
 
+            return new BaseResponse<>(getPatientHomeDto);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 
 
 }
