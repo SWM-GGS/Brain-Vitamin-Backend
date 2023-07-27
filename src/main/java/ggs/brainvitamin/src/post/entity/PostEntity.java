@@ -2,6 +2,7 @@ package ggs.brainvitamin.src.post.entity;
 
 import ggs.brainvitamin.config.BaseEntity;
 import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
+import ggs.brainvitamin.src.post.patient.dto.EmotionDto;
 import ggs.brainvitamin.src.user.entity.FamilyEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -54,6 +55,9 @@ public class PostEntity extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostImgEntity> postImgEntityList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post")
     private List<CommentEntity> commentEntityList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<EmotionEntity> emotionEntityList = new ArrayList<>();
 }
