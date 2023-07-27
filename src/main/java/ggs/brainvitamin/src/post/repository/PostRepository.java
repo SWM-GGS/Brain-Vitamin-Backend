@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
 
     Optional<PostEntity> findById(Long Id);
-    List<PostEntity> findByFamilyId(Long familyId);
+    List<PostEntity> findByFamilyIdOrderByCreatedAtDesc(Long familyId);
 }
