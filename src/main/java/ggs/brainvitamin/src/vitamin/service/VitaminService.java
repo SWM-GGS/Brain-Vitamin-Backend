@@ -1,6 +1,7 @@
 package ggs.brainvitamin.src.vitamin.service;
 
 import ggs.brainvitamin.config.BaseException;
+import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
 import ggs.brainvitamin.src.user.entity.UserEntity;
@@ -33,7 +34,7 @@ public class VitaminService {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
-        if (userEntity.getStatusCode().getCodeDetail().equals("ACTI02")) {
+        if (userEntity.getStatus().equals(Status.INACTIVE)) {
             throw new BaseException(NOT_ACTIVATED_USER);
         }
 
@@ -77,7 +78,7 @@ public class VitaminService {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
-        if (userEntity.getStatusCode().getCodeDetail().equals("ACTI02")) {
+        if (userEntity.getStatus().equals(Status.INACTIVE)) {
             throw new BaseException(NOT_ACTIVATED_USER);
         }
 

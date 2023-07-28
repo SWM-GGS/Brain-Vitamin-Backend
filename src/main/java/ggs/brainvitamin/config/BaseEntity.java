@@ -19,7 +19,11 @@ public class BaseEntity {
     @Column(name = "updatedAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status")
-    private CommonCodeDetailEntity statusCode;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 8)
+    protected Status status = Status.ACTIVE;
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }
