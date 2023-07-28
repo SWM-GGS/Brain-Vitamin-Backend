@@ -54,7 +54,6 @@ public enum BaseResponseStatus {
     // 신고 관련 요청 오류
     INVALID_REPORT_TYPE(false,2190,"잘못된 신고 형식입니다."),
 
-
     // 페이징 관련 요청 오류
     EMPTY_PAGE_INDEX(false,2200,"페이지 인덱스 값이 필요합니다."),
     INVALID_PAGE_INDEX(false,2201,"잘못된 페이지 인덱스입니다."),
@@ -64,15 +63,20 @@ public enum BaseResponseStatus {
     POST_OVER_LENGTH_TOPIC(false,2505,"제목은 최대 45자까지 입력해주세요."),
     POST_EMPTY_CONTENTS(false,2510,"내용을 입력해주세요."),
     POST_OVER_LENGTH_CONTENTS(false,2515,"내용은 최대 255자까지 입력해주세요."),
+    POST_NOT_EXISTS(false, 2520, "존재하지 않는 게시글입니다."),
 
     //댓글 관련 오류
     COMMENT_EMPTY_CONTENTS(false, 2600, "내용을 입력해주세요."),
     COMMENT_OVER_LENGTH_CONTENTS(false, 2605, "내용은 최대 100자까지 입력해주세요."),
 
+    // 감정표현 관련 오류
+    EMOTION_NOT_EXISTS(false, 2700, "존재하지 않는 감정표현입니다."),
+
     INVALID_ACCESS_KAKAO(false, 2700, "카카오 로그인에 실패하였습니다."),
     INVALID_ACCESS_GOOGLE(false, 2701, "구글 로그인에 실패하였습니다."),
     INVALID_ACCESS_NAVER(false, 2702, "네이버 로그인에 실패하였습니다."),
     INVALID_ACCESS_APPLE(false, 2703, "애플 로그인에 실패하였습니다."),
+
 
     /**
      * 3000 : Response 오류
