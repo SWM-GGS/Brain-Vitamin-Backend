@@ -1,5 +1,11 @@
 package ggs.brainvitamin.src.post.patient.service;
 
+import ggs.brainvitamin.config.BaseException;
+import ggs.brainvitamin.config.BaseResponseStatus;
+import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
+import ggs.brainvitamin.src.common.entity.CommonCodeEntity;
+import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
+import ggs.brainvitamin.src.common.repository.CommonCodeRepository;
 import ggs.brainvitamin.src.post.entity.CommentEntity;
 import ggs.brainvitamin.src.post.entity.EmotionEntity;
 import ggs.brainvitamin.src.post.entity.PostEntity;
@@ -15,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+
+import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,24 +31,47 @@ public class PatientPostService {
 
     private final PostRepository postRepository;
     private final FamilyMemberRepository familyMemberRepository;
+    private final CommonCodeRepository commonCodeRepository;
+    private final CommonCodeDetailRepository commonCodeDetailRepository;
 
-    public List<PostMainDto> listFamilyStoriesMain(Long familyId) {
+    public PostMainDto getFamilyStoriesMain(Long familyId) {
 
         // familyId로 해당 가족 그룹의 게시글을 조회
         List<PostEntity> familyPostResults = postRepository.findByFamilyIdOrderByCreatedAtDesc(familyId);
-        List<PostMainDto> familyPostMainList = new ArrayList<>();
+        List<PostPreviewDto> familyPostPreviewList = new ArrayList<>();
 
-        // 각 postEntity에서 게시글 id와 첫번째 이미지를 가져와 postMainDto에 저장
+        // 각 postEntity에서 게시글 id와 첫번째 이미지를 가져와 postMainDto 구성
         for (PostEntity post : familyPostResults) {
-            familyPostMainList.add(
-                    PostMainDto.builder()
+            familyPostPreviewList.add(
+                    PostPreviewDto.builder()
                             .id(post.getId())
                             .thumbnailUrl(post.getPostImgEntityList().get(0).getImgUrl())
                             .build()
             );
         }
 
-        return familyPostMainList;
+        // 모든 감정표현의 종류를 공통 코드 테이블을 통해 조회하여 리스트
+        CommonCodeEntity commonCodeEntity = commonCodeRepository.findByCode("EMOT")
+                        .orElseThrow(() -> new BaseException(CODE_NOT_EXISTS));
+
+        List<CommonCodeDetailEntity> commonCodeDetailEntityList =
+                commonCodeDetailRepository.findByCommonCode(commonCodeEntity);
+
+        List<EmotionInfoDto> emotionInfoDtoList = new ArrayList<>();
+        for (CommonCodeDetailEntity commonCodeDetailEntity : commonCodeDetailEntityList) {
+            emotionInfoDtoList.add(
+                    EmotionInfoDto.builder()
+                            .id(commonCodeDetailEntity.getId())
+                            .CodeDetailName(commonCodeDetailEntity.getCodeDetailName())
+                            .build()
+            );
+        }
+
+        // return 할 PostMainDto 빌드
+        return PostMainDto.builder()
+                .postPreviewDtoList(familyPostPreviewList)
+                .emotionInfoDtoList(emotionInfoDtoList)
+                .build();
     }
 
     public PostDetailDto getFamilyStoriesPost(Long postId) {

@@ -5,6 +5,7 @@ import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.post.patient.dto.EmotionDto;
 import ggs.brainvitamin.src.post.patient.dto.PostDetailDto;
 import ggs.brainvitamin.src.post.patient.dto.PostMainDto;
+import ggs.brainvitamin.src.post.patient.dto.PostPreviewDto;
 import ggs.brainvitamin.src.post.patient.service.PatientEmotionService;
 import ggs.brainvitamin.src.post.patient.service.PatientPostService;
 import jakarta.validation.Valid;
@@ -26,9 +27,9 @@ public class PatientPostController {
      * 환자용앱 우리 가족이야기 메인 페이지 조회
      */
     @GetMapping("/{familyId}")
-    public BaseResponse<List<PostMainDto>> getFamilyStoriesMain(@PathVariable("familyId") Long familyId) {
+    public BaseResponse<PostMainDto> getFamilyStoriesMain(@PathVariable("familyId") Long familyId) {
         try {
-            return new BaseResponse<>(patientPostService.listFamilyStoriesMain(familyId));
+            return new BaseResponse<>(patientPostService.getFamilyStoriesMain(familyId));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
@@ -50,15 +51,15 @@ public class PatientPostController {
     /**
      *
      * @param postId
-     * @param emotionDto
+     * @param emotionId
      * 환자용앱 특정 게시글에 감정표현 하나 추가
      */
     @PostMapping("/{familyId}/{postId}/emotion")
     public BaseResponse<String> postEmotion(@PathVariable("postId") Long postId,
-                                            @Valid @RequestBody EmotionDto emotionDto) {
+                                            @Valid @RequestBody String emotionId) {
         try {
-            Long userId = null; // 로그인 기능 구현 이후에 추가 예정
-            patientEmotionService.addEmotion(postId, userId, emotionDto.getId());
+            Long userId = Long.valueOf(2); // 테스트용 아이디, 로그인 기능 구현 이후에 추가 예정
+            patientEmotionService.addEmotion(postId, userId, Long.parseLong(emotionId));
 
             return new BaseResponse<>("감정표현이 성공적으로 추가되었습니다.");
         } catch (BaseException e) {
