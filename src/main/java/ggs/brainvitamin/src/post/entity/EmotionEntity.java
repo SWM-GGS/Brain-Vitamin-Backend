@@ -4,13 +4,19 @@ import ggs.brainvitamin.config.BaseEntity;
 import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
 @Table(name = "EMOTION")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@DynamicInsert
 public class EmotionEntity extends BaseEntity {
 
     @Id
