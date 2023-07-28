@@ -72,10 +72,13 @@ public enum BaseResponseStatus {
     // 감정표현 관련 오류
     EMOTION_NOT_EXISTS(false, 2700, "존재하지 않는 감정표현입니다."),
 
-    INVALID_ACCESS_KAKAO(false, 2700, "카카오 로그인에 실패하였습니다."),
-    INVALID_ACCESS_GOOGLE(false, 2701, "구글 로그인에 실패하였습니다."),
-    INVALID_ACCESS_NAVER(false, 2702, "네이버 로그인에 실패하였습니다."),
-    INVALID_ACCESS_APPLE(false, 2703, "애플 로그인에 실패하였습니다."),
+    // 공통코드 관련 오류
+    CODE_NOT_EXISTS(false, 2800, "존재하지 않는 감정표현입니다."),
+
+    INVALID_ACCESS_KAKAO(false, 2900, "카카오 로그인에 실패하였습니다."),
+//    INVALID_ACCESS_GOOGLE(false, 2701, "구글 로그인에 실패하였습니다."),
+//    INVALID_ACCESS_NAVER(false, 2702, "네이버 로그인에 실패하였습니다."),
+//    INVALID_ACCESS_APPLE(false, 2703, "애플 로그인에 실패하였습니다."),
 
 
     /**
