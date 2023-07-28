@@ -2,17 +2,12 @@ package ggs.brainvitamin.src.post.patient.controller;
 
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
-import ggs.brainvitamin.src.post.patient.dto.EmotionDto;
-import ggs.brainvitamin.src.post.patient.dto.PostDetailDto;
-import ggs.brainvitamin.src.post.patient.dto.PostMainDto;
-import ggs.brainvitamin.src.post.patient.dto.PostPreviewDto;
+import ggs.brainvitamin.src.post.patient.dto.*;
 import ggs.brainvitamin.src.post.patient.service.PatientEmotionService;
 import ggs.brainvitamin.src.post.patient.service.PatientPostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/patient/family-stories")
@@ -51,17 +46,29 @@ public class PatientPostController {
     /**
      *
      * @param postId
-     * @param emotionId
+     * @param emotionIdDto
      * 환자용앱 특정 게시글에 감정표현 하나 추가
      */
     @PostMapping("/{familyId}/{postId}/emotion")
     public BaseResponse<String> postEmotion(@PathVariable("postId") Long postId,
-                                            @Valid @RequestBody String emotionId) {
+                                            @Valid @RequestBody EmotionIdDto emotionIdDto) {
         try {
             Long userId = Long.valueOf(2); // 테스트용 아이디, 로그인 기능 구현 이후에 추가 예정
-            patientEmotionService.addEmotion(postId, userId, Long.parseLong(emotionId));
+            patientEmotionService.addEmotion(postId, userId, emotionIdDto.getId());
 
             return new BaseResponse<>("감정표현이 성공적으로 추가되었습니다.");
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @DeleteMapping("{familyId}/{postId}/emotion")
+    public BaseResponse<String> deleteEmotion(@PathVariable("postId") Long postId,
+                                              @Valid @RequestBody EmotionIdDto emotionIdDto) {
+        try {
+            patientEmotionService.removeEmotion(postId, emotionIdDto.getId());
+            return new BaseResponse<>("감정표현을 성공적으로 취소했습니다");
+
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }

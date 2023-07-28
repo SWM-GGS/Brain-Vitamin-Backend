@@ -31,6 +31,14 @@ public class PatientEmotionService {
     private final UserRepository userRepository;
     private final EmotionRepository emotionRepository;
 
+    /**
+     *
+     * @param postId
+     * @param userId
+     * @param emotionId
+     * @throws BaseException
+     * 환자용앱 게시글 감정표현 추가 함수
+     */
     public void addEmotion(Long postId, Long userId, Long emotionId) throws BaseException {
 
         // 게시글이 존재하지 않는 경우
@@ -57,5 +65,20 @@ public class PatientEmotionService {
                         .emotionTypeCode(commonCodeDetailEntity)
                         .build()
         );
+    }
+
+    public void removeEmotion(Long postId, Long emotionId) {
+
+        // 게시글이 존재하지 않는 경우
+        PostEntity postEntity = postRepository.findById(postId)
+                .orElseThrow(() -> new BaseException(POST_NOT_EXISTS));
+
+        // id로 해당 감정표현 삭제
+        emotionRepository.deleteById(emotionId);
+
+        // 게시글의 감정표현 갯수 감소 후 저장
+        postEntity.decreaseEmotionCount();
+        postRepository.save(postEntity);
+
     }
 }
