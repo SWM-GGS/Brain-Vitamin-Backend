@@ -60,4 +60,12 @@ public class PostEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "post")
     private List<EmotionEntity> emotionEntityList = new ArrayList<>();
+
+    public void increaseEmotionsCount() {
+        this.emotionsCount++;
+    }
+
+    public void decreaseEmotionCount() {
+        this.emotionsCount--;
+    }
 }
