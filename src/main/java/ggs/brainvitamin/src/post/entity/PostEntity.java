@@ -64,4 +64,8 @@ public class PostEntity extends BaseEntity {
     public void increaseEmotionsCount() {
         this.emotionsCount++;
     }
+
+    public void decreaseEmotionCount() {
+        this.emotionsCount--;
+    }
 }
