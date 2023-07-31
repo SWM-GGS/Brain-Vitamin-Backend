@@ -62,6 +62,12 @@ public class PatientPostController {
         }
     }
 
+    /**
+     *
+     * @param postId
+     * @param emotionIdDto
+     * 환자용앱 특정 게시글 감정표현 취소
+     */
     @DeleteMapping("{familyId}/{postId}/emotion")
     public BaseResponse<String> deleteEmotion(@PathVariable("postId") Long postId,
                                               @Valid @RequestBody EmotionIdDto emotionIdDto) {
