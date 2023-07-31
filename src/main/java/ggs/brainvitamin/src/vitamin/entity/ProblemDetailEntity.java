@@ -22,6 +22,9 @@ public class ProblemDetailEntity extends BaseEntity {
     @Column(columnDefinition = "TINYINT NOT NULL")
     private Integer elementSize;
 
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
+    private String poolLocation;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_id")
     private ProblemEntity problem;
