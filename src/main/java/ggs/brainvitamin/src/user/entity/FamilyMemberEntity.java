@@ -2,6 +2,8 @@ package ggs.brainvitamin.src.user.entity;
 
 import ggs.brainvitamin.config.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -10,7 +12,9 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @Table(name = "FAMILY_MEMBER")
 @NoArgsConstructor
+@AllArgsConstructor
 @DynamicInsert
+@Builder
 public class FamilyMemberEntity extends BaseEntity {
 
     @Id
