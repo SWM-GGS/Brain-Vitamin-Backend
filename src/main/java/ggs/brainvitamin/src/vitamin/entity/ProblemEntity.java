@@ -32,4 +32,10 @@ public class ProblemEntity extends BaseEntity {
     @Column(columnDefinition = "INT UNSIGNED NOT NULL")
     private Long timeLimit;
 
+    @Column(columnDefinition = "VARCHAR(50) NOT NULL")
+    private String pathUri;
+
+    @Column(nullable = false)
+    private String explanation;
+
 }
