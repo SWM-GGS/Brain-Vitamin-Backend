@@ -18,9 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
@@ -94,7 +92,7 @@ public class PatientPostService {
             List<EmotionDto> emotionDtoList = makeEmotionDtoList(postValues.getEmotionEntityList());
 
             // 게시글 댓글 리스트 구성
-            List<CommentDto> commentDtoList = makeCommentDtoList(postValues.getCommentEntityList());
+            LinkedHashMap<Long, CommentDto> commentDtoMap = makeCommentDtoMap(postValues.getCommentEntityList());
 
             return PostDetailDto.builder()
                     .id(postValues.getId())
@@ -109,7 +107,7 @@ public class PatientPostService {
                     .emotionsCount(postValues.getEmotionsCount())
                     .emotionDtoList(emotionDtoList)
                     .commentsCount(postValues.getCommentsCount())
-                    .commentDtoList(commentDtoList)
+                    .commentDtoMap(commentDtoMap)
                     .build();
         } else {
             return null;
@@ -150,36 +148,31 @@ public class PatientPostService {
     }
 
     // 게시글 댓글, 답글 리스트 구성 함수
-    private List<CommentDto> makeCommentDtoList(List<CommentEntity> commentEntityList) {
+    private LinkedHashMap<Long, CommentDto> makeCommentDtoMap(List<CommentEntity> commentEntityList) {
 
-        List<CommentDto> commentDtoList = new ArrayList<>();
+        // 먼저 등록된 순으로 정렬하여
+        // parentsId가 없으면 commentId로 Map에 삽입 (부모 댓글)
+        // parentsId가 있으면 parentId로 Map에 삽입 (자식 댓글)
+        LinkedHashMap<Long, CommentDto> commentDtoLinkedHashMap = new LinkedHashMap<>();
         for (CommentEntity commentEntity : commentEntityList) {
-            commentDtoList.add(
-                    CommentDto.builder()
-                            .id(commentEntity.getId())
-                            .contents(commentEntity.getContents())
-                            .postId(commentEntity.getPost().getId())
-                            .parentsId(commentEntity.getParentsId())
-                            .childCommentList(makeChildCommentDtoList(commentDtoList, commentEntity.getId()))
-                            .createdAt(commentEntity.getCreatedAt().toString())
-                            .userId(commentEntity.getUser().getId())
-                            .userName(commentEntity.getUser().getName())
-                            .profileImgUrl(commentEntity.getUser().getProfileImgUrl())
-                            .build()
-            );
-        }
-        return commentDtoList;
-    }
+            CommentDto commentDto = CommentDto.builder()
+                    .id(commentEntity.getId())
+                    .contents(commentEntity.getContents())
+                    .postId(commentEntity.getPost().getId())
+                    .parentsId(commentEntity.getParentsId())
+                    .childCommentList(new ArrayList<>())
+                    .createdAt(commentEntity.getCreatedAt().toString())
+                    .userId(commentEntity.getUser().getId())
+                    .userName(commentEntity.getUser().getName())
+                    .profileImgUrl(commentEntity.getUser().getProfileImgUrl())
+                    .build();
 
-    // 게시글 답글 구조 구성 함수
-    private List<CommentDto> makeChildCommentDtoList(List<CommentDto> commentDtoList, Long parentsId) {
-
-        List<CommentDto> childCommentList = new ArrayList<>();
-        for (CommentDto commentDto : commentDtoList) {
-            if (commentDto.getParentsId().equals(parentsId)) {
-                childCommentList.add(commentDto);
+            if (commentEntity.getParentsId() == 0) {
+                commentDtoLinkedHashMap.put(commentEntity.getId(), commentDto);
+            } else {
+                commentDtoLinkedHashMap.get(commentEntity.getParentsId()).getChildCommentList().add(0, commentDto);
             }
         }
-        return childCommentList;
+        return commentDtoLinkedHashMap;
     }
 }
