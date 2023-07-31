@@ -3,7 +3,6 @@ package ggs.brainvitamin.src.user.guardian.controller;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupDetailDto;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupMainDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupPreviewDto;
 import ggs.brainvitamin.src.user.guardian.service.GuardianFamilyService;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +22,12 @@ public class GuardianUserController {
      * 가족 그룹 리스트 조회 함수
      */
     @GetMapping("/family-group")
-    public BaseResponse<FamilyGroupMainDto> getFamilyGroupList() {
+    public BaseResponse<List<FamilyGroupPreviewDto>> getFamilyGroupList() {
         try {
             Long userId = Long.parseLong("2");  // 인증 기능 추가 시 구현 예정
 
-            FamilyGroupMainDto familyGroupMainDto = guardianFamilyService.getFamilyGroupList(userId);
-            return new BaseResponse<>(familyGroupMainDto);
+            List<FamilyGroupPreviewDto> familyGroupPreviewDtoList = guardianFamilyService.getFamilyGroupList(userId);
+            return new BaseResponse<>(familyGroupPreviewDtoList);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
