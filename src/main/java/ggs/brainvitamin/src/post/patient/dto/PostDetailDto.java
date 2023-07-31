@@ -36,5 +36,5 @@ public class PostDetailDto {
 
     // 댓글 정보
     private Long commentsCount;
-    private LinkedHashMap<Long, CommentDto> commentDtoMap = new LinkedHashMap<>();
+    private List<CommentDto> commentDtoList;
 }
