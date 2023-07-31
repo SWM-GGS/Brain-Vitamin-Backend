@@ -1,7 +1,10 @@
 package ggs.brainvitamin.src.user.guardian.service;
 
+import ggs.brainvitamin.config.BaseException;
+import ggs.brainvitamin.config.BaseResponseStatus;
 import ggs.brainvitamin.src.user.entity.FamilyEntity;
 import ggs.brainvitamin.src.user.entity.FamilyMemberEntity;
+import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupDetailDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupMainDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupPreviewDto;
 import ggs.brainvitamin.src.user.repository.FamilyMemberRepository;
@@ -12,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +54,27 @@ public class GuardianFamilyService {
         // 가족 그룹 메인 Dto에 저장하여 반환
         return FamilyGroupMainDto.builder()
                 .familyGroupPreviewDtoList(familyGroupPreviewDtoList)
+                .build();
+    }
+
+    /**
+     * 가족 그룹 검색 시 결과 조회
+     * @param familyKey
+     * @return
+     */
+    public FamilyGroupDetailDto findFamilyGroupWithFamilyKey(String familyKey) {
+        FamilyEntity familyEntity = familyRepository.findByFamilyKey(familyKey)
+                .orElseThrow(() -> new BaseException(INVALID_FAMILY_KEY));
+
+        String firstUserName = familyMemberRepository.findTopByFamilyId(familyEntity.getId())
+                .getUser().getName();
+
+        return FamilyGroupDetailDto.builder()
+                .id(familyEntity.getId())
+                .familyName(familyEntity.getFamilyName())
+                .memberCount(familyEntity.getMemberCount())
+                .profileImgUrl(familyEntity.getProfileImgUrl())
+                .firstUserName(firstUserName)
                 .build();
     }
 }

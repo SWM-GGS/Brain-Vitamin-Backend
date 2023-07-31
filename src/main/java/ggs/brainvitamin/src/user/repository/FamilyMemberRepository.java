@@ -12,5 +12,6 @@ import java.util.List;
 public interface FamilyMemberRepository extends JpaRepository<FamilyMemberEntity, Long> {
     Optional<FamilyMemberEntity> findById(Long Id);
     List<FamilyMemberEntity> findByUserId(Long userId);
+    FamilyMemberEntity findTopByFamilyId(Long familyId);
 
 }

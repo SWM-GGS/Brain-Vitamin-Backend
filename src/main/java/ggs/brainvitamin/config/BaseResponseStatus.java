@@ -80,6 +80,9 @@ public enum BaseResponseStatus {
 //    INVALID_ACCESS_NAVER(false, 2702, "네이버 로그인에 실패하였습니다."),
 //    INVALID_ACCESS_APPLE(false, 2703, "애플 로그인에 실패하였습니다."),
 
+    // 가족 그룹 관련 오류
+    INVALID_FAMILY_KEY(false, 2950, "유효한 가족고유 번호가 아닙니다"),
+
 
     /**
      * 3000 : Response 오류
