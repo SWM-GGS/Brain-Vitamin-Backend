@@ -3,16 +3,21 @@ package ggs.brainvitamin.src.user.guardian.service;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.src.user.entity.FamilyEntity;
 import ggs.brainvitamin.src.user.entity.FamilyMemberEntity;
+import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupDetailDto;
+import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupJoinDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupPreviewDto;
 import ggs.brainvitamin.src.user.repository.FamilyMemberRepository;
 import ggs.brainvitamin.src.user.repository.FamilyRepository;
+import ggs.brainvitamin.src.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
@@ -23,6 +28,7 @@ public class GuardianFamilyService {
 
     private final FamilyRepository familyRepository;
     private final FamilyMemberRepository familyMemberRepository;
+    private final UserRepository userRepository;
 
     /**
      *
@@ -62,15 +68,51 @@ public class GuardianFamilyService {
         FamilyEntity familyEntity = familyRepository.findByFamilyKey(familyKey)
                 .orElseThrow(() -> new BaseException(INVALID_FAMILY_KEY));
 
-        String firstUserName = familyMemberRepository.findTopByFamilyId(familyEntity.getId())
-                .getUser().getName();
+        FamilyMemberEntity firstFamilyMember = familyMemberRepository.findTopByFamilyId(familyEntity.getId())
+                .orElseThrow(() -> new BaseException(MEMBER_NOT_EXISTS));
 
         return FamilyGroupDetailDto.builder()
                 .id(familyEntity.getId())
                 .familyName(familyEntity.getFamilyName())
                 .memberCount(familyEntity.getMemberCount())
                 .profileImgUrl(familyEntity.getProfileImgUrl())
-                .firstUserName(firstUserName)
+                .firstUserName(firstFamilyMember.getUser().getName())
                 .build();
+    }
+
+    /**
+     * 새로운 유저의 가족 그룹 가입 처리 함수
+     * @param familyGroupJoinDto
+     * @param userId
+     */
+    public void joinFamilyGroup(FamilyGroupJoinDto familyGroupJoinDto, Long userId) {
+
+        // 가족 그룹 정보 조회
+        FamilyEntity familyEntity = familyRepository.findById(familyGroupJoinDto.getFamilyId())
+                .orElseThrow(() -> new BaseException(FAMILY_NOT_EXISTS));
+
+        // 이미 가입된 사용자에 대한 예외 처리
+        List<FamilyMemberEntity> joinedFamilyGroupList = familyMemberRepository.findByUserId(userId);
+        for (FamilyMemberEntity familyMemberEntity : joinedFamilyGroupList) {
+            if (familyMemberEntity.getFamily().getId() == familyGroupJoinDto.getFamilyId()) {
+                throw new BaseException(ALREADY_JOINED_FAMILY);
+            }
+        }
+
+        // 가입하고자 하는 유저 조회
+        UserEntity userEntity = userRepository.findById(userId)
+                        .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
+        // 실질적인 사용자 가입 처리
+        familyEntity.increaseMemberCount();
+        familyRepository.save(familyEntity);
+
+        familyMemberRepository.save(
+            FamilyMemberEntity.builder()
+                    .family(familyEntity)
+                    .user(userEntity)
+                    .relationship(familyGroupJoinDto.getRelationship())
+                    .build()
+        );
     }
 }
