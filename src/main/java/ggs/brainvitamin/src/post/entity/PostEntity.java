@@ -59,6 +59,7 @@ public class PostEntity extends BaseEntity {
     private List<CommentEntity> commentEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
+    @OrderBy("createdAt asc")
     private List<EmotionEntity> emotionEntityList = new ArrayList<>();
 
     public void increaseEmotionsCount() {
