@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Data
@@ -34,5 +36,5 @@ public class PostDetailDto {
 
     // 댓글 정보
     private Long commentsCount;
-    private List<CommentDto> commentDtoList = new ArrayList<>();
+    private LinkedHashMap<Long, CommentDto> commentDtoMap = new LinkedHashMap<>();
 }
