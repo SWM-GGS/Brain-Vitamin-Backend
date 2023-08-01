@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.stream.events.Comment;
 import java.util.*;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
@@ -92,7 +93,7 @@ public class PatientPostService {
             List<EmotionDto> emotionDtoList = makeEmotionDtoList(postValues.getEmotionEntityList());
 
             // 게시글 댓글 리스트 구성
-            LinkedHashMap<Long, CommentDto> commentDtoMap = makeCommentDtoMap(postValues.getCommentEntityList());
+            List<CommentDto> commentDtoList = makeCommentDtoMap(postValues.getCommentEntityList());
 
             return PostDetailDto.builder()
                     .id(postValues.getId())
@@ -107,7 +108,7 @@ public class PatientPostService {
                     .emotionsCount(postValues.getEmotionsCount())
                     .emotionDtoList(emotionDtoList)
                     .commentsCount(postValues.getCommentsCount())
-                    .commentDtoMap(commentDtoMap)
+                    .commentDtoList(commentDtoList)
                     .build();
         } else {
             return null;
@@ -148,7 +149,7 @@ public class PatientPostService {
     }
 
     // 게시글 댓글, 답글 리스트 구성 함수
-    private LinkedHashMap<Long, CommentDto> makeCommentDtoMap(List<CommentEntity> commentEntityList) {
+    private List<CommentDto> makeCommentDtoMap(List<CommentEntity> commentEntityList) {
 
         // 먼저 등록된 순으로 정렬하여
         // parentsId가 없으면 commentId로 Map에 삽입 (부모 댓글)
@@ -173,6 +174,10 @@ public class PatientPostService {
                 commentDtoLinkedHashMap.get(commentEntity.getParentsId()).getChildCommentList().add(0, commentDto);
             }
         }
-        return commentDtoLinkedHashMap;
+
+        List<CommentDto> commentDtoList = new ArrayList<>(commentDtoLinkedHashMap.values());
+        Collections.reverse(commentDtoList);
+
+        return commentDtoList;
     }
 }
