@@ -22,9 +22,6 @@ public class FamilyEntity extends BaseEntity {
     @Column(columnDefinition = "INT UNSIGNED")
     private Long id;
 
-    @Column(nullable = false, name = "profile_img")
-    private String profileImgUrl;
-
     @Column(nullable = false, name = "family_key")
     private String familyKey;
 
