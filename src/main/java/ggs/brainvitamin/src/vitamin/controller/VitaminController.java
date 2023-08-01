@@ -3,6 +3,7 @@ package ggs.brainvitamin.src.vitamin.controller;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
+import ggs.brainvitamin.src.vitamin.dto.response.GetCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.dto.MarketDto;
 import ggs.brainvitamin.src.vitamin.dto.MazeDto;
@@ -74,6 +75,22 @@ public class VitaminController {
             vitaminService.setUserDetails(userId, postUserDetailDto);
 
             return new BaseResponse<>("회원 정보 받기 완료!");
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 두뇌 비타민 인지 향상 게임 데이터 조회
+     * @return List<GetCogTrainingDto>
+     */
+    @GetMapping("/vitamins/cog-training")
+    public BaseResponse<List<GetCogTrainingDto>> getCogTraining() {
+        try {
+            Long userId = 1L;
+            List<GetCogTrainingDto> getCogTrainingDtos = vitaminService.getCogTraining(userId);
+
+            return new BaseResponse<>(getCogTrainingDtos);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }

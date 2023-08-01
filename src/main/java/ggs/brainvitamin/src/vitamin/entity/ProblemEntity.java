@@ -30,6 +30,12 @@ public class ProblemEntity extends BaseEntity {
     private String trainingName;
 
     @Column(columnDefinition = "INT UNSIGNED NOT NULL")
-    private Long timeLimit;
+    private Integer timeLimit;
+
+    @Column(columnDefinition = "VARCHAR(50) NOT NULL")
+    private String pathUri;
+
+    @Column(nullable = false)
+    private String explanation;
 
 }
