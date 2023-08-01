@@ -1,12 +1,14 @@
 package ggs.brainvitamin.src.user.guardian.service;
 
 import ggs.brainvitamin.config.BaseException;
+import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.FamilyEntity;
 import ggs.brainvitamin.src.user.entity.FamilyMemberEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupDetailDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupJoinDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupPreviewDto;
+import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupQuitDto;
 import ggs.brainvitamin.src.user.repository.FamilyMemberRepository;
 import ggs.brainvitamin.src.user.repository.FamilyRepository;
 import ggs.brainvitamin.src.user.repository.UserRepository;
@@ -114,5 +116,24 @@ public class GuardianFamilyService {
                     .relationship(familyGroupJoinDto.getRelationship())
                     .build()
         );
+    }
+
+    public void quitFamilyGroup(FamilyGroupQuitDto familyGroupQuitDto, Long userId) {
+
+        // 가족 그룹 정보 조회
+        FamilyEntity familyEntity = familyRepository.findById(familyGroupQuitDto.getFamilyId())
+                .orElseThrow(() -> new BaseException(FAMILY_NOT_EXISTS));
+
+        // 가입하고자 하는 유저 조회
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
+        // 실질적인 사용자 가족 그룹 탈퇴 처리
+        FamilyMemberEntity quitMember =
+                familyMemberRepository.findByUserIdAndFamilyIdAndStatus(userId, familyGroupQuitDto.getFamilyId(), Status.ACTIVE)
+                        .orElseThrow(() -> new BaseException(MEMBER_NOT_EXISTS));
+
+        quitMember.setStatus(Status.INACTIVE);
+        familyMemberRepository.save(quitMember);
     }
 }

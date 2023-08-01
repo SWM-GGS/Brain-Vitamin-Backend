@@ -1,5 +1,6 @@
 package ggs.brainvitamin.src.user.repository;
 
+import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.FamilyEntity;
 import ggs.brainvitamin.src.user.entity.FamilyMemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,6 @@ public interface FamilyMemberRepository extends JpaRepository<FamilyMemberEntity
     Optional<FamilyMemberEntity> findById(Long Id);
     List<FamilyMemberEntity> findByUserId(Long userId);
     Optional<FamilyMemberEntity> findTopByFamilyId(Long familyId);
+    Optional<FamilyMemberEntity> findByUserIdAndFamilyIdAndStatus(Long userId, Long familyId, Status status);
 
 }

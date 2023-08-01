@@ -6,6 +6,7 @@ import ggs.brainvitamin.src.post.patient.dto.EmotionIdDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupDetailDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupJoinDto;
 import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupPreviewDto;
+import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupQuitDto;
 import ggs.brainvitamin.src.user.guardian.service.GuardianFamilyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,11 @@ public class GuardianUserController {
         }
     }
 
+    /**
+     * 새로운 가족 그룹 가입 함수
+     * @param familyGroupJoinDto
+     * @return
+     */
     @PostMapping("/family-group")
     public BaseResponse<String> postJoinFamilyGroup(@Valid @RequestBody FamilyGroupJoinDto familyGroupJoinDto) {
         try {
@@ -54,6 +60,24 @@ public class GuardianUserController {
             guardianFamilyService.joinFamilyGroup(familyGroupJoinDto, userId);
 
             return new BaseResponse<>("가족 그룹에 성공적으로 가입하였습니다.");
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 가입된 가족 그룹 탈퇴 함수
+     * @param familyGroupQuitDto
+     * @return
+     */
+    @DeleteMapping("/family-group")
+    public BaseResponse<String> deleteJoinedFamilyGroup(@Valid @RequestBody FamilyGroupQuitDto familyGroupQuitDto) {
+        try {
+
+            Long userId = Long.parseLong("2"); // 인증 기능 구현 후 추가 예정
+            guardianFamilyService.quitFamilyGroup(familyGroupQuitDto, userId);
+
+            return new BaseResponse<>("가족 그룹을 성공적으로 탈퇴하였습니다.");
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
