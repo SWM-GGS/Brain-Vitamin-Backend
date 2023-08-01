@@ -82,7 +82,9 @@ public enum BaseResponseStatus {
 
     // 가족 그룹 관련 오류
     INVALID_FAMILY_KEY(false, 2950, "유효한 가족고유 번호가 아닙니다"),
-
+    FAMILY_NOT_EXISTS(false, 2951, "존재하지 않는 가족 그룹입니다."),
+    ALREADY_JOINED_FAMILY(false, 2952, "이미 가입한 가족 그룹입니다."),
+    MEMBER_NOT_EXISTS(false, 2953, "가족 그룹에 멤버가 존재하지 않습니다."),
 
     /**
      * 3000 : Response 오류
