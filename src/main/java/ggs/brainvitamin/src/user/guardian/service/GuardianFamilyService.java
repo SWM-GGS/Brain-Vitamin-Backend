@@ -148,13 +148,18 @@ public class GuardianFamilyService {
         familyMemberRepository.save(quitMember);
     }
 
+    /**
+     * 가족 그룹 프로필 이미지 수정 함수
+     * @param familyGroupProfileDto
+     * @param userId
+     */
     public void updateFamilyGroupProfileImg(FamilyGroupProfileDto familyGroupProfileDto, Long userId) {
 
         // 가족 그룹 정보 조회
         FamilyEntity familyEntity = familyRepository.findById(familyGroupProfileDto.getFamilyId())
                 .orElseThrow(() -> new BaseException(FAMILY_NOT_EXISTS));
 
-        // 가입하고자 하는 유저 조회
+        // 현재 유저 조회
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
 
