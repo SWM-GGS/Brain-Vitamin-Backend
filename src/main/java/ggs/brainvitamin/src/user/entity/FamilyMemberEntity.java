@@ -2,14 +2,12 @@ package ggs.brainvitamin.src.user.entity;
 
 import ggs.brainvitamin.config.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "FAMILY_MEMBER")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,4 +30,7 @@ public class FamilyMemberEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String relationship;
+
+    @Column
+    private String familyGroupProfileImg;
 }
