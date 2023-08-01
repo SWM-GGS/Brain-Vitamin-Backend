@@ -49,7 +49,7 @@ public class GuardianFamilyService {
                     FamilyGroupPreviewDto.builder()
                             .id(familyEntity.getId())
                             .familyName(familyEntity.getFamilyName())
-                            .profileImgUrl(familyEntity.getProfileImgUrl())
+                            .profileImgUrl(familyMemberEntity.getFamilyGroupProfileImg())
                             .build()
             );
         }
@@ -67,14 +67,20 @@ public class GuardianFamilyService {
         FamilyEntity familyEntity = familyRepository.findByFamilyKey(familyKey)
                 .orElseThrow(() -> new BaseException(INVALID_FAMILY_KEY));
 
-        FamilyMemberEntity firstFamilyMember = familyMemberRepository.findTopByFamilyId(familyEntity.getId())
-                .orElseThrow(() -> new BaseException(MEMBER_NOT_EXISTS));
+        List<FamilyMemberEntity> familyMemberEntityList = familyMemberRepository.findTop2ByFamilyId(familyEntity.getId());
+        FamilyMemberEntity firstFamilyMember;
+
+        if (familyMemberEntityList.size() > 1) {
+            firstFamilyMember = familyMemberEntityList.get(1);
+        } else {
+            firstFamilyMember = familyMemberEntityList.get(0);
+        }
 
         return FamilyGroupDetailDto.builder()
                 .id(familyEntity.getId())
                 .familyName(familyEntity.getFamilyName())
                 .memberCount(familyEntity.getMemberCount())
-                .profileImgUrl(familyEntity.getProfileImgUrl())
+                .profileImgUrl(firstFamilyMember.getFamilyGroupProfileImg())
                 .firstUserName(firstFamilyMember.getUser().getName())
                 .build();
     }
@@ -134,6 +140,9 @@ public class GuardianFamilyService {
         FamilyMemberEntity quitMember =
                 familyMemberRepository.findByUserIdAndFamilyIdAndStatus(userId, familyGroupQuitDto.getFamilyId(), Status.ACTIVE)
                         .orElseThrow(() -> new BaseException(MEMBER_NOT_EXISTS));
+
+        familyEntity.decreaseMemberCount();
+        familyRepository.save(familyEntity);
 
         quitMember.setStatus(Status.INACTIVE);
         familyMemberRepository.save(quitMember);
