@@ -3,10 +3,7 @@ package ggs.brainvitamin.src.user.guardian.controller;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.post.patient.dto.EmotionIdDto;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupDetailDto;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupJoinDto;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupPreviewDto;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupQuitDto;
+import ggs.brainvitamin.src.user.guardian.dto.*;
 import ggs.brainvitamin.src.user.guardian.service.GuardianFamilyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +27,6 @@ public class GuardianUserController {
     public BaseResponse<List<FamilyGroupPreviewDto>> getFamilyGroupList() {
         try {
             Long userId = Long.parseLong("2");  // 인증 기능 추가 시 구현 예정
-
             List<FamilyGroupPreviewDto> familyGroupPreviewDtoList = guardianFamilyService.getFamilyGroupList(userId);
             return new BaseResponse<>(familyGroupPreviewDtoList);
         } catch (BaseException e) {
@@ -55,7 +51,6 @@ public class GuardianUserController {
     @PostMapping("/family-group")
     public BaseResponse<String> postJoinFamilyGroup(@Valid @RequestBody FamilyGroupJoinDto familyGroupJoinDto) {
         try {
-
             Long userId = Long.parseLong("2"); // 인증 기능 구현 후 추가 예정
             guardianFamilyService.joinFamilyGroup(familyGroupJoinDto, userId);
 
@@ -73,11 +68,21 @@ public class GuardianUserController {
     @DeleteMapping("/family-group")
     public BaseResponse<String> deleteJoinedFamilyGroup(@Valid @RequestBody FamilyGroupQuitDto familyGroupQuitDto) {
         try {
-
             Long userId = Long.parseLong("2"); // 인증 기능 구현 후 추가 예정
             guardianFamilyService.quitFamilyGroup(familyGroupQuitDto, userId);
 
             return new BaseResponse<>("가족 그룹을 성공적으로 탈퇴하였습니다.");
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @PutMapping("/family-group/profile")
+    public BaseResponse<String> postFamilyGroupProfile(@Valid @RequestBody FamilyGroupProfileDto familyGroupProfileDto) {
+        try {
+            Long userId = Long.parseLong("2"); // 인증 기능 구현 후 추가 예정
+            guardianFamilyService.updateFamilyGroupProfileImg(familyGroupProfileDto, userId);
+            return new BaseResponse<>("프로필 이미지가 성공적으로 변경되었습니다.");
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }

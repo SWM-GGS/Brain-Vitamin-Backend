@@ -5,10 +5,7 @@ import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.FamilyEntity;
 import ggs.brainvitamin.src.user.entity.FamilyMemberEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupDetailDto;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupJoinDto;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupPreviewDto;
-import ggs.brainvitamin.src.user.guardian.dto.FamilyGroupQuitDto;
+import ggs.brainvitamin.src.user.guardian.dto.*;
 import ggs.brainvitamin.src.user.repository.FamilyMemberRepository;
 import ggs.brainvitamin.src.user.repository.FamilyRepository;
 import ggs.brainvitamin.src.user.repository.UserRepository;
@@ -118,6 +115,11 @@ public class GuardianFamilyService {
         );
     }
 
+    /**
+     * 가족 그룹 탈퇴 함수
+     * @param familyGroupQuitDto
+     * @param userId
+     */
     public void quitFamilyGroup(FamilyGroupQuitDto familyGroupQuitDto, Long userId) {
 
         // 가족 그룹 정보 조회
@@ -135,5 +137,27 @@ public class GuardianFamilyService {
 
         quitMember.setStatus(Status.INACTIVE);
         familyMemberRepository.save(quitMember);
+    }
+
+    public void updateFamilyGroupProfileImg(FamilyGroupProfileDto familyGroupProfileDto, Long userId) {
+
+        // 가족 그룹 정보 조회
+        FamilyEntity familyEntity = familyRepository.findById(familyGroupProfileDto.getFamilyId())
+                .orElseThrow(() -> new BaseException(FAMILY_NOT_EXISTS));
+
+        // 가입하고자 하는 유저 조회
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
+        // 해당 사용자에 대하여 가족 그룹 프로필 이미지 변경
+        FamilyMemberEntity familyMemberEntity =
+                familyMemberRepository.findByUserIdAndFamilyIdAndStatus(userId, familyGroupProfileDto.getFamilyId(), Status.ACTIVE)
+                        .orElseThrow(() -> new BaseException(MEMBER_NOT_EXISTS));
+
+        familyMemberEntity.setFamilyGroupProfileImg(
+                familyGroupProfileDto.getFamilyGroupProfileImg()
+        );
+
+        familyMemberRepository.save(familyMemberEntity);
     }
 }
