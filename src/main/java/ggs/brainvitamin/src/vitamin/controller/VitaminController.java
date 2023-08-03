@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/patient")
@@ -85,12 +86,12 @@ public class VitaminController {
      * @return List<GetCogTrainingDto>
      */
     @GetMapping("/vitamins/cog-training")
-    public BaseResponse<List<GetCogTrainingDto>> getCogTraining() {
+    public BaseResponse<List<Map<String, Object>>> getCogTraining() {
         try {
             Long userId = 1L;
-            List<GetCogTrainingDto> getCogTrainingDtos = vitaminService.getCogTraining(userId);
+            List<Map<String, Object>> responseMap = vitaminService.getCogTraining(userId);
 
-            return new BaseResponse<>(getCogTrainingDtos);
+            return new BaseResponse<>(responseMap);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
