@@ -3,6 +3,7 @@ package ggs.brainvitamin.src.vitamin.entity;
 import ggs.brainvitamin.config.BaseEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,4 +36,13 @@ public class BrainVitaminHistoryEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String result;
+
+    @Builder
+    public BrainVitaminHistoryEntity(UserEntity user, ProblemEntity problem, Integer score, Float duration, String result) {
+        this.user = user;
+        this.problem = problem;
+        this.score = score;
+        this.duration = duration;
+        this.result = result;
+    }
 }

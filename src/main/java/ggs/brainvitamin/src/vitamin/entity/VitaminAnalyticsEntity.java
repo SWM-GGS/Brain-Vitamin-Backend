@@ -3,6 +3,7 @@ package ggs.brainvitamin.src.vitamin.entity;
 import ggs.brainvitamin.config.BaseEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,4 +45,19 @@ public class VitaminAnalyticsEntity extends BaseEntity {
 
     @Column
     private Integer soundScore;
+
+    @Builder
+    public VitaminAnalyticsEntity(UserEntity user,
+                                  Integer memoryScore, Integer attentionScore, Integer orientationScore, Integer visualScore,
+                                  Integer languageScore, Integer calculationScore, Integer executiveScore, Integer soundScore) {
+        this.user = user;
+        this.memoryScore = memoryScore;
+        this.attentionScore = attentionScore;
+        this.orientationScore = orientationScore;
+        this.visualScore = visualScore;
+        this.languageScore = languageScore;
+        this.calculationScore = calculationScore;
+        this.executiveScore = executiveScore;
+        this.soundScore = soundScore;
+    }
 }
