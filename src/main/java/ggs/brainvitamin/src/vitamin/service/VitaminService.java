@@ -6,12 +6,14 @@ import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.repository.UserRepository;
+import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.CogTrainingPoolDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.entity.*;
 import ggs.brainvitamin.src.vitamin.repository.*;
+import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static ggs.brainvitamin.config.BaseResponseStatus.NOT_ACTIVATED_PROBLEM;
 import static ggs.brainvitamin.config.BaseResponseStatus.NOT_ACTIVATED_USER;
 
 @Service
@@ -31,6 +34,7 @@ public class VitaminService {
     private final ScreeningTestHistoryRepository screeningTestHistoryRepository;
     private final CommonCodeDetailRepository commonCodeDetailRepository;
     private final VitaminAnalyticsRepository vitaminAnalyticsRepository;
+    private final BrainVitaminHistoryRepository brainVitaminHistoryRepository;
     private final ProblemRepository problemRepository;
     private final ProblemDetailRepository problemDetailRepository;
     private final PoolSfRepository poolSfRepository;
@@ -264,4 +268,71 @@ public class VitaminService {
         return result;
     }
 
+    public String determinateCogTraining(Long userId, List<PostCogTrainingDto> postCogTrainingDtos) {
+
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+
+        // 영역별 점수
+        Integer memoryScore = 0;
+        Integer attentionScore = 0;
+        Integer orientationScore = 0;
+        Integer visualScore = 0;
+        Integer languageScore = 0;
+        Integer calculationScore = 0;
+        Integer executiveScore = 0;
+        Integer soundScore = 0;
+
+        for (PostCogTrainingDto postCogTrainingDto : postCogTrainingDtos) {
+            ProblemEntity problemEntity = problemRepository.findById(postCogTrainingDto.getProblemId())
+                    .orElseThrow(() -> new BaseException(NOT_ACTIVATED_PROBLEM));
+
+            String cogArea = problemEntity.getProblemCategory().getAreaCode().getCodeDetailName();
+
+            if (postCogTrainingDto.getResult().equals("SUCCESS")) {
+                switch (cogArea) {
+                    case "기억력" -> memoryScore += postCogTrainingDto.getScore();
+                    case "주의집중력" -> attentionScore += postCogTrainingDto.getScore();
+                    case "시공간/지남력" -> orientationScore += postCogTrainingDto.getScore();
+                    case "시지각능력" -> visualScore += postCogTrainingDto.getScore();
+                    case "언어능력" -> languageScore += postCogTrainingDto.getScore();
+                    case "계산능력" -> calculationScore += postCogTrainingDto.getScore();
+                    case "집행능력" -> executiveScore += postCogTrainingDto.getScore();
+                    default -> soundScore += postCogTrainingDto.getScore();
+                }
+            }
+
+
+            BrainVitaminHistoryEntity brainVitaminHistoryEntity = BrainVitaminHistoryEntity.builder()
+                    .user(userEntity)
+                    .problem(problemEntity)
+                    .score(postCogTrainingDto.getScore())
+                    .duration(postCogTrainingDto.getDuration())
+                    .result(postCogTrainingDto.getResult())
+                    .build();
+
+            brainVitaminHistoryRepository.save(brainVitaminHistoryEntity);
+        }
+
+        VitaminAnalyticsEntity vitaminAnalyticsEntity = VitaminAnalyticsEntity.builder()
+                .user(userEntity)
+                .memoryScore(memoryScore)
+                .attentionScore(attentionScore)
+                .orientationScore(orientationScore)
+                .visualScore(visualScore)
+                .languageScore(languageScore)
+                .calculationScore(calculationScore)
+                .executiveScore(executiveScore)
+                .soundScore(soundScore)
+                .build();
+
+        vitaminAnalyticsRepository.save(vitaminAnalyticsEntity);
+
+        Integer totalScore = memoryScore + attentionScore + orientationScore + visualScore +
+                languageScore + calculationScore + executiveScore + soundScore;
+
+        String result = "상위 " + (101 - (totalScore * 100 / 70)) + "%";
+        return result;
+    }
 }
