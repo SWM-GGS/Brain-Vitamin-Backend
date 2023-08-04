@@ -6,12 +6,14 @@ import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.repository.UserRepository;
+import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.CogTrainingPoolDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.entity.*;
 import ggs.brainvitamin.src.vitamin.repository.*;
+import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static ggs.brainvitamin.config.BaseResponseStatus.NOT_ACTIVATED_PROBLEM;
 import static ggs.brainvitamin.config.BaseResponseStatus.NOT_ACTIVATED_USER;
 
 @Service
@@ -31,6 +34,7 @@ public class VitaminService {
     private final ScreeningTestHistoryRepository screeningTestHistoryRepository;
     private final CommonCodeDetailRepository commonCodeDetailRepository;
     private final VitaminAnalyticsRepository vitaminAnalyticsRepository;
+    private final BrainVitaminHistoryRepository brainVitaminHistoryRepository;
     private final ProblemRepository problemRepository;
     private final ProblemDetailRepository problemDetailRepository;
     private final PoolSfRepository poolSfRepository;
@@ -96,10 +100,7 @@ public class VitaminService {
         userRepository.save(userEntity);
     }
 
-    public List<GetCogTrainingDto> getCogTraining(Long userId) {
-        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
-
+    public List<Map<String, Object>> getCogTraining(Long userId) {
 //        List<VitaminAnalyticsEntity> vitaminHistoryEntities = vitaminAnalyticsRepository.findTop5ByUserOrderByCreatedAtDesc(userEntity);
 //
 //        // 두뇌 비타민 기록이 없을때 -> 아예 랜덤으로 문제 가져오기
@@ -112,15 +113,13 @@ public class VitaminService {
 //        else {
 //
 //        }
-
-        // 일단 MVP에는 영역당 1문제씩 밖에 없어서 그냥 다 긁어오기
         List<ProblemEntity> problemEntities = problemRepository.findAll();
 
-        List<GetCogTrainingDto> getCogTrainingDtos = new ArrayList<>();
+        List<Map<String, Object>> result = new ArrayList<>();
 
         for (ProblemEntity problemEntity : problemEntities) {
 
-            String cogArea = problemEntity.getProblemCategory().getAreaCode().getCodeDetailName();
+            Map<String, Object> candidate = new HashMap<>();
 
             Random random = new Random();
             Integer randomDifficulty = random.nextInt(1,4);
@@ -129,27 +128,39 @@ public class VitaminService {
                 randomDifficulty = 1;
             }
 
+            candidate.put("problemId", problemEntity.getId());
+            candidate.put("trainingName", problemEntity.getTrainingName());
+            candidate.put("explanation", problemEntity.getExplanation());
+            candidate.put("difficulty", randomDifficulty);
+            candidate.put("cogArea", problemEntity.getProblemCategory().getAreaCode().getCodeDetailName());
+            candidate.put("timeLimit", problemEntity.getTimeLimit());
+
+            // 난이도 3일때는 할인 적용
+            if (problemEntity.getTrainingName().equals("시장에서 쇼핑하기")) {
+                if (randomDifficulty == 3) {
+                    // 할인율을 [5, 10, 15, ..., 50]에서 랜덤 추출
+                    candidate.put("discountPercent", random.nextInt(1, 11) * 5);
+                }
+                else {
+                    candidate.put("discountPercent", 0);
+                }
+
+            }
+
             ProblemDetailEntity problemDetailEntity = problemDetailRepository.findProblemDetailEntityByProblemAndAndDifficulty(problemEntity, randomDifficulty);
 
-            getCogTrainingDtos.add(generateCogTrainingDto(problemEntity, cogArea, problemDetailEntity));
+            candidate.put("problemPool", getPool(problemEntity, problemDetailEntity));
+
+            result.add(candidate);
         }
 
-        return getCogTrainingDtos;
+        return result;
     }
 
-    private GetCogTrainingDto generateCogTrainingDto(ProblemEntity problemEntity, String cogArea, ProblemDetailEntity problemDetailEntity) {
+    public List<Map<String, Object>> getPool(ProblemEntity problemEntity, ProblemDetailEntity problemDetailEntity) {
         Random random = new Random();
 
-        GetCogTrainingDto resultGetCogTrainingDto = new GetCogTrainingDto();
-
-        resultGetCogTrainingDto.setCogArea(cogArea);
-        resultGetCogTrainingDto.setDifficulty(problemDetailEntity.getDifficulty());
-        resultGetCogTrainingDto.setExplanation(problemEntity.getExplanation());
-        resultGetCogTrainingDto.setTrainingName(problemEntity.getTrainingName());
-        resultGetCogTrainingDto.setPathUri(problemEntity.getPathUri());
-        resultGetCogTrainingDto.setTimeLimit(problemEntity.getTimeLimit());
-
-        List<CogTrainingPoolDto> resultCogTrainingPoolDto = new ArrayList<>();
+        List<Map<String, Object>> result = new ArrayList<>();
 
         switch (problemEntity.getTrainingName()) {
 
@@ -162,12 +173,12 @@ public class VitaminService {
 
                 // 난이도 별로 3, 4, 6개 뽑기
                 for (int i = 0; i < problemDetailEntity.getElementSize(); i++) {
-                    CogTrainingPoolDto cogTrainingPoolDto = new CogTrainingPoolDto();
-                    cogTrainingPoolDto.setImgUrl(poolCardEntities.get(i).getImgUrl());
-                    resultCogTrainingPoolDto.add(cogTrainingPoolDto);
+                    Map<String, Object> candidate = new HashMap<>();
+
+                    candidate.put("imgUrl", poolCardEntities.get(i).getImgUrl());
+                    result.add(candidate);
                 }
 
-                resultGetCogTrainingDto.setCogTrainingPoolDtos(resultCogTrainingPoolDto);
                 break;
 
             case "팔레트 따라 색칠하기":
@@ -184,33 +195,26 @@ public class VitaminService {
                 Collections.shuffle(poolMcEntities);
 
                 for (int i = 0; i < 8; i++) {
-                    CogTrainingPoolDto cogTrainingPoolDto = new CogTrainingPoolDto();
+                    Map<String, Object> candidate = new HashMap<>();
 
-                    cogTrainingPoolDto.setContents(poolMcEntities.get(i).getContents());
+                    candidate.put("contents", poolMcEntities.get(i).getContents());
 
                     if (i < problemDetailEntity.getElementSize()) {
-                        cogTrainingPoolDto.setImgUrl(poolMcEntities.get(i).getImgUrl());
-                        cogTrainingPoolDto.setAnswer(true);
+                        candidate.put("imgUrl", poolMcEntities.get(i).getImgUrl());
+                        candidate.put("answer", Boolean.TRUE);
+                    } else {
+                        candidate.put("answer", Boolean.FALSE);
                     }
-                    else {
-                        cogTrainingPoolDto.setAnswer(false);
-                    }
-
-                    resultCogTrainingPoolDto.add(cogTrainingPoolDto);
+                    result.add(candidate);
                 }
 
-                resultGetCogTrainingDto.setCogTrainingPoolDtos(resultCogTrainingPoolDto);
                 break;
 
             case "시장에서 쇼핑하기":
-                // 난이도 3일때는 할인 적용
-                if (problemDetailEntity.getDifficulty().equals(3)) {
-                    // 할인율을 [5, 10, 15, ..., 50]에서 랜덤 추출
-                    resultGetCogTrainingDto.setDiscountPercent(random.nextInt(1, 11) * 5);
-                }
-
                 List<PoolSfEntity> poolSfEntities = poolSfRepository.findRandom3ByProblem(problemEntity.getId());
                 for (PoolSfEntity poolSfEntity : poolSfEntities) {
+                    Map<String, Object> candidate = new HashMap<>();
+
                     // 가격 100원 단위로 랜덤 추출
                     Integer randomPrice = random.nextInt(poolSfEntity.getMinRange()/100, poolSfEntity.getMaxRange()/100 + 1) * 100;
                     Integer randomCount = 1;
@@ -220,10 +224,13 @@ public class VitaminService {
                         randomCount = random.nextInt(1, 6);
                     }
 
-                    resultCogTrainingPoolDto.add(new CogTrainingPoolDto(poolSfEntity.getImgUrl(), poolSfEntity.getElementName(), randomPrice, randomCount));
+                    candidate.put("contents", poolSfEntity.getElementName());
+                    candidate.put("imgUrl", poolSfEntity.getImgUrl());
+                    candidate.put("price", randomPrice);
+                    candidate.put("count", randomCount);
+                    result.add(candidate);
                 }
 
-                resultGetCogTrainingDto.setCogTrainingPoolDtos(resultCogTrainingPoolDto);
                 break;
 
             case "미로 길찾기":
@@ -231,24 +238,22 @@ public class VitaminService {
 
                 List<PoolMazeDetailEntity> poolMazeDetailEntities = poolMazeEntity.getPoolMazeDetails();
 
-                resultGetCogTrainingDto.setImgUrl(poolMazeEntity.getImgUrl());
-
                 for (PoolMazeDetailEntity poolMazeDetailEntity : poolMazeDetailEntities) {
-                    CogTrainingPoolDto cogTrainingPoolDto = new CogTrainingPoolDto();
-                    cogTrainingPoolDto.setX(poolMazeDetailEntity.getX());
-                    cogTrainingPoolDto.setY(poolMazeDetailEntity.getY());
+                    Map<String, Object> candidate = new HashMap<>();
+
+                    candidate.put("imgUrl", poolMazeEntity.getImgUrl());
+                    candidate.put("x", poolMazeDetailEntity.getX());
+                    candidate.put("y", poolMazeDetailEntity.getY());
 
                     if (poolMazeDetailEntity.getAnswer().equals("T")) {
-                        cogTrainingPoolDto.setAnswer(true);
+                        candidate.put("answer", Boolean.TRUE);
                     }
                     else {
-                        cogTrainingPoolDto.setAnswer(false);
+                        candidate.put("answer", Boolean.FALSE);
                     }
-
-                    resultCogTrainingPoolDto.add(cogTrainingPoolDto);
+                    result.add(candidate);
                 }
 
-                resultGetCogTrainingDto.setCogTrainingPoolDtos(resultCogTrainingPoolDto);
                 break;
             case "오늘의 날짜 찾기":
                 // 난이도만 넘겨주면 됨
@@ -260,6 +265,74 @@ public class VitaminService {
                 break;
         }
 
-        return resultGetCogTrainingDto;
+        return result;
+    }
+
+    public String determinateCogTraining(Long userId, List<PostCogTrainingDto> postCogTrainingDtos) {
+
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+
+        // 영역별 점수
+        Integer memoryScore = 0;
+        Integer attentionScore = 0;
+        Integer orientationScore = 0;
+        Integer visualScore = 0;
+        Integer languageScore = 0;
+        Integer calculationScore = 0;
+        Integer executiveScore = 0;
+        Integer soundScore = 0;
+
+        for (PostCogTrainingDto postCogTrainingDto : postCogTrainingDtos) {
+            ProblemEntity problemEntity = problemRepository.findById(postCogTrainingDto.getProblemId())
+                    .orElseThrow(() -> new BaseException(NOT_ACTIVATED_PROBLEM));
+
+            String cogArea = problemEntity.getProblemCategory().getAreaCode().getCodeDetailName();
+
+            if (postCogTrainingDto.getResult().equals("SUCCESS")) {
+                switch (cogArea) {
+                    case "기억력" -> memoryScore += postCogTrainingDto.getScore();
+                    case "주의집중력" -> attentionScore += postCogTrainingDto.getScore();
+                    case "시공간/지남력" -> orientationScore += postCogTrainingDto.getScore();
+                    case "시지각능력" -> visualScore += postCogTrainingDto.getScore();
+                    case "언어능력" -> languageScore += postCogTrainingDto.getScore();
+                    case "계산능력" -> calculationScore += postCogTrainingDto.getScore();
+                    case "집행능력" -> executiveScore += postCogTrainingDto.getScore();
+                    default -> soundScore += postCogTrainingDto.getScore();
+                }
+            }
+
+
+            BrainVitaminHistoryEntity brainVitaminHistoryEntity = BrainVitaminHistoryEntity.builder()
+                    .user(userEntity)
+                    .problem(problemEntity)
+                    .score(postCogTrainingDto.getScore())
+                    .duration(postCogTrainingDto.getDuration())
+                    .result(postCogTrainingDto.getResult())
+                    .build();
+
+            brainVitaminHistoryRepository.save(brainVitaminHistoryEntity);
+        }
+
+        VitaminAnalyticsEntity vitaminAnalyticsEntity = VitaminAnalyticsEntity.builder()
+                .user(userEntity)
+                .memoryScore(memoryScore)
+                .attentionScore(attentionScore)
+                .orientationScore(orientationScore)
+                .visualScore(visualScore)
+                .languageScore(languageScore)
+                .calculationScore(calculationScore)
+                .executiveScore(executiveScore)
+                .soundScore(soundScore)
+                .build();
+
+        vitaminAnalyticsRepository.save(vitaminAnalyticsEntity);
+
+        Integer totalScore = memoryScore + attentionScore + orientationScore + visualScore +
+                languageScore + calculationScore + executiveScore + soundScore;
+
+        String result = "상위 " + (101 - (totalScore * 100 / 70)) + "%";
+        return result;
     }
 }

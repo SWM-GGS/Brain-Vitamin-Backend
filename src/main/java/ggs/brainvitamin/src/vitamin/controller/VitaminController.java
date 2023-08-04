@@ -2,6 +2,7 @@ package ggs.brainvitamin.src.vitamin.controller;
 
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
+import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/patient")
@@ -39,7 +41,7 @@ public class VitaminController {
 
     /**
      * 인지 선별 검사를 위한 회원 정보 받기
-     * @param postUserDetailDto
+     * @repuest postUserDetailDto
      */
     @PostMapping("/vitamins/user-details")
     public BaseResponse<String> setUserDetails(@RequestBody PostUserDetailDto postUserDetailDto) {
@@ -58,12 +60,29 @@ public class VitaminController {
      * @return List<GetCogTrainingDto>
      */
     @GetMapping("/vitamins/cog-training")
-    public BaseResponse<List<GetCogTrainingDto>> getCogTraining() {
+    public BaseResponse<List<Map<String, Object>>> getCogTraining() {
         try {
             Long userId = 1L;
-            List<GetCogTrainingDto> getCogTrainingDtos = vitaminService.getCogTraining(userId);
+            List<Map<String, Object>> responseMap = vitaminService.getCogTraining(userId);
 
-            return new BaseResponse<>(getCogTrainingDtos);
+            return new BaseResponse<>(responseMap);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 두뇌 비타민 중단 및 종료
+     * @request List<PostCogTrainingDto>
+     * @return String
+     */
+    @PostMapping("/vitamins/cog-training")
+    public BaseResponse<String> determinateCogTraining(@RequestBody List<PostCogTrainingDto> postCogTrainingDtos) {
+        try {
+            Long userId = 1L;
+            String result = vitaminService.determinateCogTraining(userId, postCogTrainingDtos);
+
+            return new BaseResponse<>(result);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
