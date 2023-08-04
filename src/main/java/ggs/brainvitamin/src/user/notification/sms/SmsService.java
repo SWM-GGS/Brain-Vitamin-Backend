@@ -117,7 +117,7 @@ public class SmsService {
     public String makeAuthNumberMessage() {
 
         String authNumber = generateAuthNumber();
-        String message = "\n두뇌비타민 인증번호: ";
+        String message = "\n[두뇌비타민] 인증번호: ";
 
         return message + authNumber;
     }
