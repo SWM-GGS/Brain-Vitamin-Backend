@@ -68,7 +68,7 @@ public class VitaminController {
 
     /**
      * 인지 선별 검사를 위한 회원 정보 받기
-     * @param postUserDetailDto
+     * @repuest postUserDetailDto
      */
     @PostMapping("/vitamins/user-details")
     public BaseResponse<String> setUserDetails(@RequestBody PostUserDetailDto postUserDetailDto) {
@@ -100,7 +100,7 @@ public class VitaminController {
 
     /**
      * 두뇌 비타민 중단 및 종료
-     * @param List<PostCogTrainingDto>
+     * @request List<PostCogTrainingDto>
      * @return String
      */
     @PostMapping("/vitamins/cog-training")
