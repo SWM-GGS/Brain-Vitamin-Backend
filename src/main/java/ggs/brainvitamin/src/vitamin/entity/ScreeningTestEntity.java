@@ -33,10 +33,10 @@ public class ScreeningTestEntity extends BaseEntity {
     @Column(nullable = false)
     private Integer timeLimit;
 
-    @Column(nullable = false)
+    @Column()
     private String imgUrl;
 
-    @Column(nullable = false, columnDefinition = "CHAR(1)")
+    @Column(nullable = false)
     private String answer;
 
 }

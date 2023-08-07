@@ -88,5 +88,19 @@ public class VitaminController {
         }
     }
 
+    /**
+     * 인지 선별검사 질문 조회
+     */
+    @GetMapping("/vitamins/screening-test")
+    public BaseResponse<List<Map<String, Object>>> getScreeningTest() {
+        try {
+            Long userId = 1L;
+            List<Map<String, Object>> responseMap = vitaminService.getScreeningTest(userId);
+
+            return new BaseResponse<>(responseMap);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 
 }

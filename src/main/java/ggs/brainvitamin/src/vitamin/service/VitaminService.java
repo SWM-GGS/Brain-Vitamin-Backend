@@ -31,6 +31,7 @@ import static ggs.brainvitamin.config.BaseResponseStatus.NOT_ACTIVATED_USER;
 public class VitaminService {
 
     private final UserRepository userRepository;
+    private final ScreeningTestRepository screeningTestRepository;
     private final ScreeningTestHistoryRepository screeningTestHistoryRepository;
     private final CommonCodeDetailRepository commonCodeDetailRepository;
     private final VitaminAnalyticsRepository vitaminAnalyticsRepository;
@@ -333,6 +334,24 @@ public class VitaminService {
                 languageScore + calculationScore + executiveScore + soundScore;
 
         String result = "상위 " + (101 - (totalScore * 100 / 70)) + "%";
+        return result;
+    }
+
+    public List<Map<String, Object>> getScreeningTest(Long userId) {
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        List<ScreeningTestEntity> screeningTestEntities = screeningTestRepository.findAll();
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (ScreeningTestEntity screeningTestEntity : screeningTestEntities) {
+            Map<String, Object> candidate = new HashMap<>();
+
+            candidate.put("description", screeningTestEntity.getDescription());
+            result.add(candidate);
+        }
+
         return result;
     }
 }
