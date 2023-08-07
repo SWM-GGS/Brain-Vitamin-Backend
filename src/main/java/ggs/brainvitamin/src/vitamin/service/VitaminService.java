@@ -7,6 +7,7 @@ import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
+import ggs.brainvitamin.src.vitamin.dto.request.PostScreeningTestDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.CogTrainingPoolDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetCogTrainingDto;
@@ -350,6 +351,26 @@ public class VitaminService {
 
             candidate.put("description", screeningTestEntity.getDescription());
             result.add(candidate);
+        }
+
+        return result;
+    }
+
+    public Map<String, Object> submitScreeningTest(Long userId, PostScreeningTestDto postScreeningTestDto) {
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        ScreeningTestHistoryEntity screeningTestHistoryEntity = new ScreeningTestHistoryEntity(userEntity, postScreeningTestDto.getScore());
+
+        screeningTestHistoryRepository.save(screeningTestHistoryEntity);
+
+        HashMap<String, Object> result = new HashMap<>();
+
+        if (postScreeningTestDto.getScore() >= 8) {
+            result.put("cogLevel", "의심");
+        }
+        else {
+            result.put("cogLevel", "정상");
         }
 
         return result;

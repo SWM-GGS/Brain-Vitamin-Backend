@@ -3,6 +3,7 @@ package ggs.brainvitamin.src.vitamin.controller;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
+import ggs.brainvitamin.src.vitamin.dto.request.PostScreeningTestDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
@@ -96,6 +97,21 @@ public class VitaminController {
         try {
             Long userId = 1L;
             List<Map<String, Object>> responseMap = vitaminService.getScreeningTest(userId);
+
+            return new BaseResponse<>(responseMap);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 인지 선별검사 제출
+     */
+    @PostMapping("/vitamins/screening-test")
+    public BaseResponse<Map<String, Object>> submitScreeningTest(@RequestBody PostScreeningTestDto postScreeningTestDto) {
+        try {
+            Long userId = 1L;
+            Map<String, Object> responseMap = vitaminService.submitScreeningTest(userId, postScreeningTestDto);
 
             return new BaseResponse<>(responseMap);
         } catch (BaseException e) {
