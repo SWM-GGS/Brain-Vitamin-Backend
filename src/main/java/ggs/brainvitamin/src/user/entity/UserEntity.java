@@ -3,16 +3,21 @@ package ggs.brainvitamin.src.user.entity;
 import ggs.brainvitamin.config.BaseEntity;
 import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Getter
 @Table(name = "USER")
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @DynamicInsert
 public class UserEntity extends BaseEntity {
 
@@ -52,6 +57,13 @@ public class UserEntity extends BaseEntity {
 
     @Column(columnDefinition = "INT UNSIGNED default 0 NOT NULL")
     private Integer consecutiveDays;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_authority",
+            joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
+    private Set<AuthorityEntity> authorities;
 
     /**
      * 비즈니스 코드
