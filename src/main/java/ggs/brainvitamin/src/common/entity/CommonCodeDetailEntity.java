@@ -1,11 +1,17 @@
 package ggs.brainvitamin.src.common.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "commonCodeDetail")
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CommonCodeDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
