@@ -17,4 +17,5 @@ public class SmsResponseDto {
     LocalDateTime requestTime;
     String statusCode;
     String statusName;
+    String authNum;
 }
