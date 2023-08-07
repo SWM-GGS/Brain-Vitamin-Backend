@@ -42,4 +42,14 @@ public class ScreeningTestHistoryEntity extends BaseEntity {
     @Column(nullable = false)
     private Integer languageScore;
 
+    public ScreeningTestHistoryEntity(UserEntity user, Integer totalScore) {
+        this.user = user;
+        this.totalScore = totalScore;
+        this.orientationScore = 0;
+        this.attentionScore = 0;
+        this.spaceTimeScore = 0;
+        this.executiveScore = 0;
+        this.memoryScore = 0;
+        this.languageScore = 0;
+    }
 }
