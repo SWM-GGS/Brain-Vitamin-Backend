@@ -41,7 +41,7 @@ public class PatientAuthController {
     private final CommonCodeService commonCodeService;
 
     @PostMapping("/sms")
-    public BaseResponse<String> sendSms(@RequestBody MessageDto messageDto) throws
+    public BaseResponse<SmsResponseDto> sendSms(@RequestBody MessageDto messageDto) throws
             JsonProcessingException,
             RestClientException,
             URISyntaxException,
@@ -50,7 +50,7 @@ public class PatientAuthController {
             UnsupportedEncodingException {
         try {
             SmsResponseDto responseDto = smsService.sendSms(messageDto);
-            return new BaseResponse<>("인증번호를 발송하였습니다.");
+            return new BaseResponse<>(responseDto);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
