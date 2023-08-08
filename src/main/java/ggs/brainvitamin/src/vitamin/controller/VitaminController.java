@@ -70,10 +70,10 @@ public class VitaminController {
      * 두뇌 비타민 중단 및 종료
      */
     @PostMapping("/vitamins/cog-training")
-    public BaseResponse<String> determinateCogTraining(@RequestBody List<PostCogTrainingDto> postCogTrainingDtos) {
+    public BaseResponse<String> determinateCogTraining(@RequestBody PostCogTrainingDto postCogTrainingDto) {
         try {
             Long userId = 1L;
-            String result = vitaminService.determinateCogTraining(userId, postCogTrainingDtos);
+            String result = vitaminService.determinateCogTraining(userId, postCogTrainingDto);
 
             return new BaseResponse<>(result);
         } catch (BaseException e) {
