@@ -73,4 +73,9 @@ public class UserEntity extends BaseEntity {
         this.gender = gender;
         this.educationCode = educationCode;
     }
+
+    public void plusConsecutiveDays() {
+        this.consecutiveDays++;
+    }
+
 }
