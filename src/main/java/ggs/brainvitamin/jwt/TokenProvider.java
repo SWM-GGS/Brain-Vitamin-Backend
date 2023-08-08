@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import static ggs.brainvitamin.src.user.patient.dto.TokenDto.*;
+
 @Component
 public class TokenProvider implements InitializingBean {
     private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
@@ -60,7 +62,7 @@ public class TokenProvider implements InitializingBean {
      * Authentication에 있는 권한 정보를 이용해서 엑세스 토큰을 생성한다.
      * 정보를 바탕으로 권한을 가져오고, 유효시간과 암호화를 통해 토큰을 생성한다.
      */
-    public String createAccessToken(Authentication authentication) {
+    public AccessTokenDto createAccessToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -68,19 +70,24 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date accessTokenExpiredTime = new Date(now + this.accessTokenValidityInMilliseconds);
 
-        return Jwts.builder()
+        String jwt = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(accessTokenKey, SignatureAlgorithm.HS512)
                 .setExpiration(accessTokenExpiredTime)
                 .compact();
+
+        return AccessTokenDto.builder()
+                .accessToken(jwt)
+                .accessTokenExpiresTime(accessTokenValidityInMilliseconds)
+                .build();
     }
 
     /**
      * Authentication에 있는 권한 정보를 이용해서 리프레쉬 토큰을 생성한다.
      * 정보를 바탕으로 권한을 가져오고, 유효시간과 암호화를 통해 토큰을 생성한다.
      */
-    public String createRefreshToken(Authentication authentication) {
+    public RefreshTokenDto createRefreshToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -88,10 +95,16 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date refreshTokenExpiredTime = new Date(now + this.refreshTokenValidityInMilliseconds);
 
-        return Jwts.builder().setSubject(authentication.getName())
+        String jwt = Jwts.builder().setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(refreshTokenKey, SignatureAlgorithm.HS512)
-                .setExpiration(refreshTokenExpiredTime).compact();
+                .setExpiration(refreshTokenExpiredTime)
+                .compact();
+
+        return RefreshTokenDto.builder()
+                .refreshToken(jwt)
+                .refreshTokenExpiresTime(refreshTokenValidityInMilliseconds)
+                .build();
     }
 
     /**
@@ -199,4 +212,7 @@ public class TokenProvider implements InitializingBean {
         return new TokenDto(this.createAccessToken(authentication), this.createRefreshToken(authentication));
     }
 
+    public long getAccessTokenValidityInMilliseconds() {
+        return accessTokenValidityInMilliseconds;
+    }
 }
