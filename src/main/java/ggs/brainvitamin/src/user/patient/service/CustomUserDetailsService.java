@@ -38,6 +38,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .map(grantedAuthority -> new SimpleGrantedAuthority(grantedAuthority.getAuthorityName()))
                 .collect(Collectors.toList());
 
-        return new User(userEntity.getName(), userEntity.getPhoneNumber(), grantedAuthorities);
+        return new User(userEntity.getId().toString(), userEntity.getPhoneNumber(), grantedAuthorities);
     }
 }

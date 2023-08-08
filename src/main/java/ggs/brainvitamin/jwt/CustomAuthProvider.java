@@ -27,7 +27,7 @@ public class CustomAuthProvider implements AuthenticationProvider {
 
         UserDetails user = customUserDetailsService.loadUserByUsername(phoneNumber);
 
-        return new UserToken(phoneNumber, "", null, user);
+        return new UserToken(user.getUsername(), phoneNumber,null, user);
     }
 
     @Override
