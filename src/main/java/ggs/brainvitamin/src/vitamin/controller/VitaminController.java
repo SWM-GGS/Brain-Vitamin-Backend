@@ -5,15 +5,11 @@ import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostScreeningTestDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
-import ggs.brainvitamin.src.vitamin.dto.response.GetCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
-import ggs.brainvitamin.src.vitamin.dto.MarketDto;
-import ggs.brainvitamin.src.vitamin.dto.MazeDto;
 import ggs.brainvitamin.src.vitamin.service.VitaminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +22,6 @@ public class VitaminController {
 
     /**
      * 환자 홈 화면 조회
-     * @return GetPatientHomeDto
      */
     @GetMapping("")
     public BaseResponse<GetPatientHomeDto> getPatientHome() {
@@ -42,7 +37,6 @@ public class VitaminController {
 
     /**
      * 인지 선별 검사를 위한 회원 정보 받기
-     * @repuest postUserDetailDto
      */
     @PostMapping("/vitamins/user-details")
     public BaseResponse<String> setUserDetails(@RequestBody PostUserDetailDto postUserDetailDto) {
@@ -74,8 +68,6 @@ public class VitaminController {
 
     /**
      * 두뇌 비타민 중단 및 종료
-     * @request List<PostCogTrainingDto>
-     * @return String
      */
     @PostMapping("/vitamins/cog-training")
     public BaseResponse<String> determinateCogTraining(@RequestBody List<PostCogTrainingDto> postCogTrainingDtos) {
