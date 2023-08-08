@@ -24,8 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static ggs.brainvitamin.config.BaseResponseStatus.NOT_ACTIVATED_PROBLEM;
-import static ggs.brainvitamin.config.BaseResponseStatus.NOT_ACTIVATED_USER;
+import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +50,10 @@ public class VitaminService {
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
+        if (!userEntity.getUserTypeCode().getCodeDetailName().equals("환자")) {
+            throw new BaseException(INVALID_USERTYPE);
+        }
+
         GetPatientHomeDto getPatientHomeDto = new GetPatientHomeDto();
 
         // 회원 가입 후 첫 두뇌 비타민 실행
@@ -63,7 +66,7 @@ public class VitaminService {
         else {
             getPatientHomeDto.setFirst(false);
 
-            Optional<ScreeningTestHistoryEntity> screeningTestHistoryEntity = screeningTestHistoryRepository.findScreeningTestHistoryEntityByUserOrderByCreatedAtDesc(userEntity);
+            Optional<ScreeningTestHistoryEntity> screeningTestHistoryEntity = screeningTestHistoryRepository.findTop1ByUserOrderByCreatedAtDesc(userEntity);
 
             // 인지 선별 검사가 처음인 경우
             if (screeningTestHistoryEntity.isEmpty()) {

@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface ScreeningTestHistoryRepository extends JpaRepository<ScreeningTestHistoryEntity, Long> {
-    Optional<ScreeningTestHistoryEntity> findScreeningTestHistoryEntityByUserOrderByCreatedAtDesc(UserEntity userEntity);
+    Optional<ScreeningTestHistoryEntity> findTop1ByUserOrderByCreatedAtDesc(UserEntity userEntity);
 }
