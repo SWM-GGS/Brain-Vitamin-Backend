@@ -6,6 +6,7 @@ import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.repository.UserRepository;
+import ggs.brainvitamin.src.vitamin.dto.request.CogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostScreeningTestDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
@@ -273,11 +274,19 @@ public class VitaminService {
         return result;
     }
 
-    public String determinateCogTraining(Long userId, List<PostCogTrainingDto> postCogTrainingDtos) {
+    public String determinateCogTraining(Long userId, PostCogTrainingDto postCogTrainingDto) {
 
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
+        if (!userEntity.getUserTypeCode().getCodeDetailName().equals("환자")) {
+            throw new BaseException(INVALID_USERTYPE);
+        }
+
+        // 두뇌 비타민을 끝까지 완수한 경우
+        if (postCogTrainingDto.getFinish()) {
+            userEntity.plusConsecutiveDays();
+        }
 
         // 영역별 점수
         Integer memoryScore = 0;
@@ -289,22 +298,22 @@ public class VitaminService {
         Integer executiveScore = 0;
         Integer soundScore = 0;
 
-        for (PostCogTrainingDto postCogTrainingDto : postCogTrainingDtos) {
-            ProblemEntity problemEntity = problemRepository.findById(postCogTrainingDto.getProblemId())
+        for (CogTrainingDto cogTrainingDto : postCogTrainingDto.getCogTrainingDtos()) {
+            ProblemEntity problemEntity = problemRepository.findById(cogTrainingDto.getProblemId())
                     .orElseThrow(() -> new BaseException(NOT_ACTIVATED_PROBLEM));
 
             String cogArea = problemEntity.getProblemCategory().getAreaCode().getCodeDetailName();
 
-            if (postCogTrainingDto.getResult().equals("SUCCESS")) {
+            if (cogTrainingDto.getResult().equals("SUCCESS")) {
                 switch (cogArea) {
-                    case "기억력" -> memoryScore += postCogTrainingDto.getScore();
-                    case "주의집중력" -> attentionScore += postCogTrainingDto.getScore();
-                    case "시공간/지남력" -> orientationScore += postCogTrainingDto.getScore();
-                    case "시지각능력" -> visualScore += postCogTrainingDto.getScore();
-                    case "언어능력" -> languageScore += postCogTrainingDto.getScore();
-                    case "계산능력" -> calculationScore += postCogTrainingDto.getScore();
-                    case "집행능력" -> executiveScore += postCogTrainingDto.getScore();
-                    default -> soundScore += postCogTrainingDto.getScore();
+                    case "기억력" -> memoryScore += cogTrainingDto.getScore();
+                    case "주의집중력" -> attentionScore += cogTrainingDto.getScore();
+                    case "시공간/지남력" -> orientationScore += cogTrainingDto.getScore();
+                    case "시지각능력" -> visualScore += cogTrainingDto.getScore();
+                    case "언어능력" -> languageScore += cogTrainingDto.getScore();
+                    case "계산능력" -> calculationScore += cogTrainingDto.getScore();
+                    case "집행능력" -> executiveScore += cogTrainingDto.getScore();
+                    default -> soundScore += cogTrainingDto.getScore();
                 }
             }
 
@@ -312,9 +321,9 @@ public class VitaminService {
             BrainVitaminHistoryEntity brainVitaminHistoryEntity = BrainVitaminHistoryEntity.builder()
                     .user(userEntity)
                     .problem(problemEntity)
-                    .score(postCogTrainingDto.getScore())
-                    .duration(postCogTrainingDto.getDuration())
-                    .result(postCogTrainingDto.getResult())
+                    .score(cogTrainingDto.getScore())
+                    .duration(cogTrainingDto.getDuration())
+                    .result(cogTrainingDto.getResult())
                     .build();
 
             brainVitaminHistoryRepository.save(brainVitaminHistoryEntity);
