@@ -119,6 +119,13 @@ public class VitaminService {
 //        else {
 //
 //        }
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        if (!userEntity.getUserTypeCode().getCodeDetailName().equals("환자")) {
+            throw new BaseException(INVALID_USERTYPE);
+        }
+
         List<ProblemEntity> problemEntities = problemRepository.findAll();
 
         List<Map<String, Object>> result = new ArrayList<>();
@@ -140,6 +147,7 @@ public class VitaminService {
             candidate.put("difficulty", randomDifficulty);
             candidate.put("cogArea", problemEntity.getProblemCategory().getAreaCode().getCodeDetailName());
             candidate.put("timeLimit", problemEntity.getTimeLimit());
+            candidate.put("pathUri", problemEntity.getPathUri());
 
             // 난이도 3일때는 할인 적용
             if (problemEntity.getTrainingName().equals("시장에서 쇼핑하기")) {
