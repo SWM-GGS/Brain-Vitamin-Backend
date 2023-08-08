@@ -3,21 +3,26 @@ package ggs.brainvitamin.src.user.patient.service;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponseStatus;
 import ggs.brainvitamin.config.Status;
+import ggs.brainvitamin.jwt.TokenProvider;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.user.entity.AuthorityEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.patient.dto.ActivitiesDto;
 import ggs.brainvitamin.src.post.repository.PostRepository;
+import ggs.brainvitamin.src.user.patient.dto.TokenDto;
 import ggs.brainvitamin.src.user.patient.dto.UserDto;
 import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
@@ -27,6 +32,8 @@ import static ggs.brainvitamin.config.BaseResponseStatus.*;
 public class PatientUserService {
 
     private final UserRepository userRepository;
+    private final TokenProvider tokenProvider;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public void signUp(UserDto.signUpDto signUpDto, CommonCodeDetailDto codeDetailDto) throws BaseException {
 
@@ -66,7 +73,26 @@ public class PatientUserService {
     }
 
     public Optional<UserEntity> getMyUserAuthorities() {
-        return SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByPhoneNumber);
+        return SecurityUtil.getCurrentUserId().flatMap(userRepository::findOneWithAuthoritiesByPhoneNumber);
+    }
+
+
+    public void logout(TokenDto tokenDto) {
+
+        if (!tokenProvider.isValidAccessToken(tokenDto.getAccessTokenDto().getAccessToken())) {
+            throw new BaseException(BaseResponseStatus.INVALID_TOKEN);
+        }
+
+        Authentication authentication =
+                tokenProvider.getAuthenticationByAccessToken(tokenDto.getAccessTokenDto().getAccessToken());
+
+        if (redisTemplate.opsForValue().get("RT:" + authentication.getName()) != null) {
+            redisTemplate.delete("RT:"+authentication.getName());
+        }
+
+        // 해당 Access Token 유효시간을 가지고 와서 BlackList에 저장하기
+        Long expiration = tokenProvider.getAccessTokenValidityInMilliseconds();
+        redisTemplate.opsForValue().set(tokenDto.getAccessTokenDto().getAccessToken(),"logout", expiration, TimeUnit.MILLISECONDS);
     }
 
     public ActivitiesDto getActivities(Long id) throws BaseException {

@@ -3,6 +3,7 @@ package ggs.brainvitamin.src.user.patient.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
+import ggs.brainvitamin.config.BaseResponseStatus;
 import ggs.brainvitamin.jwt.TokenProvider;
 import ggs.brainvitamin.src.common.Service.CommonCodeService;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
@@ -12,8 +13,10 @@ import ggs.brainvitamin.src.user.notification.sms.dto.SmsResponseDto;
 import ggs.brainvitamin.src.user.patient.dto.TokenDto;
 import ggs.brainvitamin.src.user.patient.dto.UserDto;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
+import ggs.brainvitamin.utils.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -28,6 +31,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import static ggs.brainvitamin.src.user.patient.dto.TokenDto.*;
 
 @RestController
 @RequestMapping("/patient")
@@ -39,9 +46,10 @@ public class PatientAuthController {
     private final PatientUserService patientUserService;
     private final SmsService smsService;
     private final CommonCodeService commonCodeService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @PostMapping("/sms")
-    public BaseResponse<String> sendSms(@RequestBody MessageDto messageDto) throws
+    public BaseResponse<SmsResponseDto> sendSms(@RequestBody MessageDto messageDto) throws
             JsonProcessingException,
             RestClientException,
             URISyntaxException,
@@ -50,7 +58,7 @@ public class PatientAuthController {
             UnsupportedEncodingException {
         try {
             SmsResponseDto responseDto = smsService.sendSms(messageDto);
-            return new BaseResponse<>("인증번호를 발송하였습니다.");
+            return new BaseResponse<>(responseDto);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
@@ -77,13 +85,22 @@ public class PatientAuthController {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(loginDto.getPhoneNumber(), "");
 
-            System.out.println("authenticationToken = " + authenticationToken);
-
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String accessToken = tokenProvider.createAccessToken(authentication);
-            String refreshToken = tokenProvider.createRefreshToken(authentication);
+            AccessTokenDto accessToken = tokenProvider.createAccessToken(authentication);
+            RefreshTokenDto refreshToken = tokenProvider.createRefreshToken(authentication);
+
+            // redis에 refresh 토큰 정보 저장 (만료 시각 아닌 '유효 시간'으로)
+//            redisTemplate.opsForValue().set(
+//                    "RT: "+SecurityUtil.getCurrentUserId().get(),
+//                    refreshToken.getRefreshToken(),
+//                    refreshToken.getRefreshTokenExpiresTime(),
+//                    TimeUnit.MILLISECONDS
+//            );
+
+            Optional<String> currentUserId = SecurityUtil.getCurrentUserId();
+            System.out.println("currentUserId = " + currentUserId.get());
 
             return new BaseResponse<>(new TokenDto(accessToken, refreshToken));
 
@@ -91,4 +108,16 @@ public class PatientAuthController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+//    @PostMapping("/logout")
+//    public BaseResponse<String> logout(TokenDto tokenDto) {
+//
+//        try {
+//            patientUserService.logout(tokenDto);
+//            return new BaseResponse<>("로그아웃이 완료되었습니다.");
+//
+//        } catch (BaseException e) {
+//            return new BaseResponse<>(e.getStatus());
+//        }
+//    }
 }

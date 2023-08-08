@@ -87,7 +87,9 @@ public class SmsService {
         headers.set("x-ncp-apigw-signature-v2", makeSignature(time));
 
         // 인증번호 생성 후 messageDto의 contents에 저장
-        messageDto.setContent(makeAuthNumberMessage());
+        String authNum = generateAuthNumber();
+        String message = "\n[두뇌비타민] 인증번호: ";
+        messageDto.setContent(message + authNum);
 
         List<MessageDto> messageDtoList = new ArrayList<>();
         messageDtoList.add(messageDto);
@@ -110,16 +112,9 @@ public class SmsService {
         SmsResponseDto responseDto = restTemplate.postForObject(
                 new URI("https://sens.apigw.ntruss.com/sms/v2/services/"+ this.serviceId +"/messages"), httpBody, SmsResponseDto.class
         );
+        responseDto.setAuthNum(authNum);
 
         return responseDto;
-    }
-
-    public String makeAuthNumberMessage() {
-
-        String authNumber = generateAuthNumber();
-        String message = "\n[두뇌비타민] 인증번호: ";
-
-        return message + authNumber;
     }
 
     private String generateAuthNumber() {
