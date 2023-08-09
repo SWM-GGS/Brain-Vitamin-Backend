@@ -1,6 +1,7 @@
 package ggs.brainvitamin.src.vitamin.entity;
 
 import ggs.brainvitamin.config.BaseEntity;
+import ggs.brainvitamin.config.Result;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -34,11 +35,12 @@ public class BrainVitaminHistoryEntity extends BaseEntity {
     @Column(nullable = false)
     private Float duration;
 
-    @Column(nullable = false)
-    private String result;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "result", nullable = false, length = 8)
+    private Result result;
 
     @Builder
-    public BrainVitaminHistoryEntity(UserEntity user, ProblemEntity problem, Integer score, Float duration, String result) {
+    public BrainVitaminHistoryEntity(UserEntity user, ProblemEntity problem, Integer score, Float duration, Result result) {
         this.user = user;
         this.problem = problem;
         this.score = score;
