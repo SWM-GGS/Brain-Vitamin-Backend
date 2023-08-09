@@ -7,11 +7,14 @@ import ggs.brainvitamin.src.vitamin.dto.request.PostScreeningTestDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.service.VitaminService;
+import ggs.brainvitamin.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
+import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
 @RestController
 @RequestMapping("/patient")
@@ -26,7 +29,8 @@ public class VitaminController {
     @GetMapping("")
     public BaseResponse<GetPatientHomeDto> getPatientHome() {
         try {
-            Long userId = 1L;
+            Long userId = getUserId();
+
             GetPatientHomeDto getPatientHomeDto = vitaminService.getPatientHome(userId);
 
             return new BaseResponse<>(getPatientHomeDto);
@@ -41,7 +45,8 @@ public class VitaminController {
     @PostMapping("/vitamins/user-details")
     public BaseResponse<String> setUserDetails(@RequestBody PostUserDetailDto postUserDetailDto) {
         try {
-            Long userId = 1L;
+            Long userId = getUserId();
+
             vitaminService.setUserDetails(userId, postUserDetailDto);
 
             return new BaseResponse<>("회원 정보 받기 완료!");
@@ -57,7 +62,8 @@ public class VitaminController {
     @GetMapping("/vitamins/cog-training")
     public BaseResponse<List<Map<String, Object>>> getCogTraining() {
         try {
-            Long userId = 1L;
+            Long userId = getUserId();
+
             List<Map<String, Object>> responseMap = vitaminService.getCogTraining(userId);
 
             return new BaseResponse<>(responseMap);
@@ -72,7 +78,8 @@ public class VitaminController {
     @PostMapping("/vitamins/cog-training")
     public BaseResponse<String> determinateCogTraining(@RequestBody PostCogTrainingDto postCogTrainingDto) {
         try {
-            Long userId = 1L;
+            Long userId = getUserId();
+
             String result = vitaminService.determinateCogTraining(userId, postCogTrainingDto);
 
             return new BaseResponse<>(result);
@@ -87,7 +94,8 @@ public class VitaminController {
     @GetMapping("/vitamins/screening-test")
     public BaseResponse<List<Map<String, Object>>> getScreeningTest() {
         try {
-            Long userId = 1L;
+            Long userId = getUserId();
+
             List<Map<String, Object>> responseMap = vitaminService.getScreeningTest(userId);
 
             return new BaseResponse<>(responseMap);
@@ -102,13 +110,21 @@ public class VitaminController {
     @PostMapping("/vitamins/screening-test")
     public BaseResponse<Map<String, Object>> submitScreeningTest(@RequestBody PostScreeningTestDto postScreeningTestDto) {
         try {
-            Long userId = 1L;
+            Long userId = getUserId();
+
             Map<String, Object> responseMap = vitaminService.submitScreeningTest(userId, postScreeningTestDto);
 
             return new BaseResponse<>(responseMap);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
+    }
+
+    private static Long getUserId() {
+        String currentUserId = SecurityUtil.getCurrentUserId()
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+        Long userId = Long.parseLong(currentUserId);
+        return userId;
     }
 
 }
