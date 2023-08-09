@@ -1,8 +1,10 @@
 package ggs.brainvitamin.src.user.patient.dto;
 
 import ggs.brainvitamin.config.Status;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -23,17 +25,10 @@ public class UserDto {
     }
 
     @Data
-    @Builder
     public static class loginDto {
 
         private String phoneNumber;
-        private Status status;
 
-        public Collection<? extends GrantedAuthority> getAuthorities() {  //계정이 갖고있는 권한목록을 리턴한다.
-            List<GrantedAuthority> auth = new ArrayList<>();
-            auth.add(new SimpleGrantedAuthority("ROLE_USER"));
-            return auth;
-        }
     }
 
     @Data
