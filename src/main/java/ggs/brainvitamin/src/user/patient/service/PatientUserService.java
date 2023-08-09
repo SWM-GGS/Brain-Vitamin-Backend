@@ -84,15 +84,12 @@ public class PatientUserService {
         TokenDto.RefreshTokenDto refreshToken = tokenProvider.createRefreshToken(authentication);
 
         // redis에 refresh 토큰 정보 저장 (만료 시각 아닌 '유효 시간'으로)
-//            redisTemplate.opsForValue().set(
-//                    "RT: "+SecurityUtil.getCurrentUserId().get(),
-//                    refreshToken.getRefreshToken(),
-//                    refreshToken.getRefreshTokenExpiresTime(),
-//                    TimeUnit.MILLISECONDS
-//            );
-
-        Optional<String> currentUserId = SecurityUtil.getCurrentUserId();
-        System.out.println("currentUserId = " + currentUserId.get());
+            redisTemplate.opsForValue().set(
+                    "RT:"+SecurityUtil.getCurrentUserId().get(),
+                    refreshToken.getRefreshToken(),
+                    refreshToken.getRefreshTokenExpiresTime(),
+                    TimeUnit.MILLISECONDS
+            );
 
         return new TokenDto(accessToken, refreshToken);
     }

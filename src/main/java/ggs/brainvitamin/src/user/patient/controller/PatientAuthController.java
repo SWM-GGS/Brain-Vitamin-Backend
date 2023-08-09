@@ -80,7 +80,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<TokenDto> login(@RequestBody UserDto.loginDto loginDto) {
+    public BaseResponse<TokenDto> login(@RequestBody UserDto.loginRequestDto loginDto) {
         try {
             return new BaseResponse<>(patientUserService.login(loginDto.getPhoneNumber()));
 
@@ -89,15 +89,15 @@ public class PatientAuthController {
         }
     }
 
-//    @PostMapping("/logout")
-//    public BaseResponse<String> logout(TokenDto tokenDto) {
-//
-//        try {
-//            patientUserService.logout(tokenDto);
-//            return new BaseResponse<>("로그아웃이 완료되었습니다.");
-//
-//        } catch (BaseException e) {
-//            return new BaseResponse<>(e.getStatus());
-//        }
-//    }
+    @PostMapping("/logout")
+    public BaseResponse<String> logout(@Valid @RequestBody TokenDto tokenDto) {
+
+        try {
+            patientUserService.logout(tokenDto);
+            return new BaseResponse<>("로그아웃이 완료되었습니다.");
+
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }
