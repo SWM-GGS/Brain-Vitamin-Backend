@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @EntityGraph(attributePaths = "authorities")
-    Optional<UserEntity> findOneWithAuthoritiesByPhoneNumber(String phoneNumber);
+    Optional<UserEntity> findOneWithAuthoritiesByPhoneNumberAndStatus(String phoneNumber, Status status);
 
     Optional<UserEntity> findByIdAndStatus(Long userId, Status status);
     Optional<UserEntity> findByPhoneNumberAndStatus(String phoneNumber, Status status);
