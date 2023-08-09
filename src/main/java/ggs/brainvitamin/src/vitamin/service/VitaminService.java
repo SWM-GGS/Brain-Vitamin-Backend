@@ -1,6 +1,7 @@
 package ggs.brainvitamin.src.vitamin.service;
 
 import ggs.brainvitamin.config.BaseException;
+import ggs.brainvitamin.config.Result;
 import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
@@ -312,7 +313,7 @@ public class VitaminService {
 
             String cogArea = problemEntity.getProblemCategory().getAreaCode().getCodeDetailName();
 
-            if (cogTrainingDto.getResult().equals("SUCCESS")) {
+            if (cogTrainingDto.getResult().equals(Result.SUCCESS)) {
                 switch (cogArea) {
                     case "기억력" -> memoryScore += cogTrainingDto.getScore();
                     case "주의집중력" -> attentionScore += cogTrainingDto.getScore();
