@@ -17,7 +17,10 @@ import ggs.brainvitamin.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,7 @@ public class PatientUserService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     public void signUp(UserDto.signUpDto signUpDto, CommonCodeDetailDto codeDetailDto) throws BaseException {
 
@@ -66,6 +70,31 @@ public class PatientUserService {
                 .build();
 
         userRepository.save(userEntity);
+    }
+
+    public TokenDto login(String phoneNumber) {
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(phoneNumber, "");
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        TokenDto.AccessTokenDto accessToken = tokenProvider.createAccessToken(authentication);
+        TokenDto.RefreshTokenDto refreshToken = tokenProvider.createRefreshToken(authentication);
+
+        // redis에 refresh 토큰 정보 저장 (만료 시각 아닌 '유효 시간'으로)
+//            redisTemplate.opsForValue().set(
+//                    "RT: "+SecurityUtil.getCurrentUserId().get(),
+//                    refreshToken.getRefreshToken(),
+//                    refreshToken.getRefreshTokenExpiresTime(),
+//                    TimeUnit.MILLISECONDS
+//            );
+
+        Optional<String> currentUserId = SecurityUtil.getCurrentUserId();
+        System.out.println("currentUserId = " + currentUserId.get());
+
+        return new TokenDto(accessToken, refreshToken);
     }
 
     public Optional<UserEntity> getUserWithAuthorities(String phoneNumber) {
