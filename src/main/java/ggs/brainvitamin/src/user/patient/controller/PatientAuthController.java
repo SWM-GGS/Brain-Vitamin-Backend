@@ -66,12 +66,13 @@ public class PatientAuthController {
     }
 
     @PostMapping("/signup")
-    public BaseResponse<String> signUp(@Valid @RequestBody UserDto.signUpDto signUpDto)
-    {
+    public BaseResponse<TokenDto> signUp(@Valid @RequestBody UserDto.signUpDto signUpDto) {
         try {
             CommonCodeDetailDto codeDetailDto = commonCodeService.getCodeWithCodeDetailName("환자");
             patientUserService.signUp(signUpDto, codeDetailDto);
-            return new BaseResponse<>("회원가입이 성공적으로 이루어졌습니다.");
+
+            // 회원가입 완료 후 바로 로그인
+            return new BaseResponse<>(patientUserService.login(signUpDto.getPhoneNumber()));
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
@@ -79,30 +80,9 @@ public class PatientAuthController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<TokenDto> login(@Valid @RequestBody UserDto.loginDto loginDto) {
-
+    public BaseResponse<TokenDto> login(@RequestBody UserDto.loginDto loginDto) {
         try {
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(loginDto.getPhoneNumber(), "");
-
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            AccessTokenDto accessToken = tokenProvider.createAccessToken(authentication);
-            RefreshTokenDto refreshToken = tokenProvider.createRefreshToken(authentication);
-
-            // redis에 refresh 토큰 정보 저장 (만료 시각 아닌 '유효 시간'으로)
-//            redisTemplate.opsForValue().set(
-//                    "RT: "+SecurityUtil.getCurrentUserId().get(),
-//                    refreshToken.getRefreshToken(),
-//                    refreshToken.getRefreshTokenExpiresTime(),
-//                    TimeUnit.MILLISECONDS
-//            );
-
-            Optional<String> currentUserId = SecurityUtil.getCurrentUserId();
-            System.out.println("currentUserId = " + currentUserId.get());
-
-            return new BaseResponse<>(new TokenDto(accessToken, refreshToken));
+            return new BaseResponse<>(patientUserService.login(loginDto.getPhoneNumber()));
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
