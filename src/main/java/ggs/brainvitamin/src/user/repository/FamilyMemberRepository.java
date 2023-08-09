@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface FamilyMemberRepository extends JpaRepository<FamilyMemberEntity, Long> {
     Optional<FamilyMemberEntity> findById(Long Id);
-    List<FamilyMemberEntity> findByUserId(Long userId);
+    List<FamilyMemberEntity> findByUserIdAndStatus(Long userId, Status status);
     List<FamilyMemberEntity> findTop2ByFamilyId(Long familyId);
     Optional<FamilyMemberEntity> findByUserIdAndFamilyIdAndStatus(Long userId, Long familyId, Status status);
 

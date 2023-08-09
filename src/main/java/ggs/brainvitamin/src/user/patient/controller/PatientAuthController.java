@@ -3,24 +3,17 @@ package ggs.brainvitamin.src.user.patient.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
-import ggs.brainvitamin.config.BaseResponseStatus;
-import ggs.brainvitamin.jwt.TokenProvider;
 import ggs.brainvitamin.src.common.Service.CommonCodeService;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.user.notification.sms.SmsService;
 import ggs.brainvitamin.src.user.notification.sms.dto.MessageDto;
 import ggs.brainvitamin.src.user.notification.sms.dto.SmsResponseDto;
+import ggs.brainvitamin.src.user.patient.dto.FamilyDto;
 import ggs.brainvitamin.src.user.patient.dto.TokenDto;
-import ggs.brainvitamin.src.user.patient.dto.UserDto;
+import ggs.brainvitamin.src.user.patient.service.PatientFamilyService;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
-import ggs.brainvitamin.utils.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,22 +24,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
-import static ggs.brainvitamin.src.user.patient.dto.TokenDto.*;
+import static ggs.brainvitamin.src.user.patient.dto.PatientUserDto.*;
 
 @RestController
 @RequestMapping("/patient")
 @RequiredArgsConstructor
 public class PatientAuthController {
 
-    private final TokenProvider tokenProvider;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PatientUserService patientUserService;
     private final SmsService smsService;
     private final CommonCodeService commonCodeService;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final PatientFamilyService patientFamilyService;
 
     @PostMapping("/sms")
     public BaseResponse<SmsResponseDto> sendSms(@RequestBody MessageDto messageDto) throws
@@ -66,12 +55,18 @@ public class PatientAuthController {
     }
 
     @PostMapping("/signup")
-    public BaseResponse<TokenDto> signUp(@Valid @RequestBody UserDto.signUpDto signUpDto) {
+    public BaseResponse<loginResponseDto> signUp(@Valid @RequestBody signUpDto signUpDto) {
         try {
+            // 함께 저장할 공통코드 정보 조회
             CommonCodeDetailDto codeDetailDto = commonCodeService.getCodeWithCodeDetailName("환자");
-            patientUserService.signUp(signUpDto, codeDetailDto);
+            // DB에 유저 insert
+            Long createdUserId = patientUserService.createPatientUser(signUpDto, codeDetailDto);
 
-            // 회원가입 완료 후 바로 로그인
+            // 추가한 유저 정보 조회하고 가족 생성 및 환자를 가족 멤버로 등록
+            PatientDetailDto patientDetailDto = patientUserService.getPatientUserDetail(createdUserId);
+            patientFamilyService.createFamily(patientDetailDto);
+
+            // 회원가입 완료 후 로그인 처리
             return new BaseResponse<>(patientUserService.login(signUpDto.getPhoneNumber()));
 
         } catch (BaseException e) {
@@ -80,9 +75,15 @@ public class PatientAuthController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<TokenDto> login(@RequestBody UserDto.loginRequestDto loginDto) {
+    public BaseResponse<loginResponseDto> login(@RequestBody loginRequestDto loginDto) {
         try {
-            return new BaseResponse<>(patientUserService.login(loginDto.getPhoneNumber()));
+            // 로그인 후 사용자 정보 조회
+            loginResponseDto loginResponseDto = patientUserService.login(loginDto.getPhoneNumber());
+            // 사용자 정보 바탕으로 가족 코드 조회
+            FamilyDto familyInfo = patientFamilyService.getFamilyInfo(loginResponseDto.getPatientDetailDto().getId());
+            loginResponseDto.getPatientDetailDto().setFamilyKey(familyInfo.getFamilyKey());
+
+            return new BaseResponse<>(loginResponseDto);
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
