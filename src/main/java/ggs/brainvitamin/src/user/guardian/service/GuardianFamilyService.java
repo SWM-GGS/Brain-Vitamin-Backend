@@ -40,7 +40,7 @@ public class GuardianFamilyService {
         List<FamilyGroupPreviewDto> familyGroupPreviewDtoList = new ArrayList<>();
 
         // family_member 테이블에서 현재 유저를 조회하여 가입된 가족 그룹을 조회하는 방식
-        List<FamilyMemberEntity> familyMemberEntityList = familyMemberRepository.findByUserId(userId);
+        List<FamilyMemberEntity> familyMemberEntityList = familyMemberRepository.findByUserIdAndStatus(userId, Status.ACTIVE);
         for (FamilyMemberEntity familyMemberEntity : familyMemberEntityList) {
 
             // 각각의 가족 그룹 Dto 구성
@@ -97,7 +97,7 @@ public class GuardianFamilyService {
                 .orElseThrow(() -> new BaseException(FAMILY_NOT_EXISTS));
 
         // 이미 가입된 사용자에 대한 예외 처리
-        List<FamilyMemberEntity> joinedFamilyGroupList = familyMemberRepository.findByUserId(userId);
+        List<FamilyMemberEntity> joinedFamilyGroupList = familyMemberRepository.findByUserIdAndStatus(userId, Status.ACTIVE);
         for (FamilyMemberEntity familyMemberEntity : joinedFamilyGroupList) {
             if (familyMemberEntity.getFamily().getId() == familyGroupJoinDto.getFamilyId()) {
                 throw new BaseException(ALREADY_JOINED_FAMILY);
