@@ -8,6 +8,7 @@ import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.service.VitaminService;
 import ggs.brainvitamin.utils.SecurityUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,7 +77,7 @@ public class VitaminController {
      * 두뇌 비타민 중단 및 종료
      */
     @PostMapping("/vitamins/cog-training")
-    public BaseResponse<String> determinateCogTraining(@RequestBody PostCogTrainingDto postCogTrainingDto) {
+    public BaseResponse<String> determinateCogTraining(@Valid @RequestBody PostCogTrainingDto postCogTrainingDto) {
         try {
             Long userId = getUserId();
 
@@ -123,8 +124,8 @@ public class VitaminController {
     private static Long getUserId() {
         String currentUserId = SecurityUtil.getCurrentUserId()
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
-        Long userId = Long.parseLong(currentUserId);
-        return userId;
+
+        return Long.parseLong(currentUserId);
     }
 
 }
