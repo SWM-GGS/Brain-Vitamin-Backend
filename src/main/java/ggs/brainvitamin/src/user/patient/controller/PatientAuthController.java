@@ -3,13 +3,13 @@ package ggs.brainvitamin.src.user.patient.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
-import ggs.brainvitamin.config.BaseResponseStatus;
-import ggs.brainvitamin.src.common.Service.CommonCodeService;
+import ggs.brainvitamin.src.common.service.CommonCodeService;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.user.notification.sms.SmsService;
 import ggs.brainvitamin.src.user.notification.sms.dto.MessageDto;
 import ggs.brainvitamin.src.user.notification.sms.dto.SmsResponseDto;
 import ggs.brainvitamin.src.user.patient.dto.FamilyDto;
+import ggs.brainvitamin.src.user.patient.dto.PatientUserDto;
 import ggs.brainvitamin.src.user.patient.dto.TokenDto;
 import ggs.brainvitamin.src.user.patient.service.PatientFamilyService;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
@@ -80,10 +80,10 @@ public class PatientAuthController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<loginResponseDto> login(@RequestBody loginRequestDto loginDto) {
+    public BaseResponse<loginResponseDto> login(@RequestBody phoneNumberDto phoneNumberDto) {
         try {
             // 로그인 후 사용자 정보 조회
-            loginResponseDto loginResponseDto = patientUserService.login(loginDto.getPhoneNumber());
+            loginResponseDto loginResponseDto = patientUserService.login(phoneNumberDto.getPhoneNumber());
             // 사용자 정보 바탕으로 가족 코드 조회
             FamilyDto familyInfo = patientFamilyService.getFamilyInfo(loginResponseDto.getPatientDetailDto().getId());
             loginResponseDto.getPatientDetailDto().setFamilyKey(familyInfo.getFamilyKey());
@@ -133,7 +133,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/reissue-tokens")
-    public BaseResponse<TokenDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
+    public BaseResponse<loginResponseDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
 
         try {
             AccessTokenDto accessToken = tokenDto.getAccessTokenDto();
@@ -144,7 +144,19 @@ public class PatientAuthController {
             if (!StringUtils.hasText(refreshToken.getRefreshToken()))
                 return new BaseResponse<>(EMPTY_REFRESH_TOKEN);
 
-            return new BaseResponse<>(patientUserService.reGenerateTokens(accessToken, refreshToken));
+            TokenDto newTokens = patientUserService.reGenerateTokens(accessToken, refreshToken);
+
+            String userId = SecurityUtil.getCurrentUserId()
+                    .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
+
+            PatientDetailDto patientDetailDto = patientUserService.getPatientUserDetail(Long.parseLong(userId));
+
+            loginResponseDto loginResponseDto = PatientUserDto.loginResponseDto.builder()
+                    .patientDetailDto(patientDetailDto)
+                    .tokenDto(newTokens)
+                    .build();
+
+            return new BaseResponse<>(loginResponseDto);
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());

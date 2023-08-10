@@ -89,4 +89,13 @@ public class UserEntity extends BaseEntity {
         this.todayVitaminCheck = todayVitaminCheck;
     }
 
+    public void updateProfiles(String nickname, String profileImgUrl, CommonCodeDetailEntity educationCode) {
+        this.nickname = nickname;
+        this.profileImgUrl = profileImgUrl;
+        this.educationCode = educationCode;
+    }
+
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public void setFontSize(Integer fontSize) { this.fontSize = fontSize; }
 }
