@@ -9,6 +9,7 @@ import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.user.entity.AuthorityEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.patient.dto.ActivitiesDto;
+import ggs.brainvitamin.src.user.patient.dto.ProfilesRequestDto;
 import ggs.brainvitamin.src.user.patient.dto.TokenDto;
 import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.utils.SecurityUtil;
@@ -181,14 +182,29 @@ public class PatientUserService {
         throw new BaseException(INVALID_REFRESH_TOKEN);
     }
 
-    private void setRefreshTokenInRedis(RefreshTokenDto refreshToken) {
+    public void updateProfilesInfo(Long userId,
+                                   ProfilesRequestDto profilesRequestDto,
+                                   CommonCodeDetailDto codeDetailDto) {
 
-        redisTemplate.opsForValue().set(
-                "RT:"+SecurityUtil.getCurrentUserId().get(),
-                refreshToken.getRefreshToken(),
-                refreshToken.getRefreshTokenExpiresTime(),
-                TimeUnit.MILLISECONDS
+        // 기존 사용자 프로필 정보 조회
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
+        // 학력 코드 업데이트를 위한 공통 코드 엔티티 생성
+        CommonCodeDetailEntity codeDetailEntity = CommonCodeDetailEntity.builder()
+                .id(codeDetailDto.getId())
+                .codeDetail(codeDetailDto.getCodeDetail())
+                .codeDetailName(codeDetailDto.getCodeDetailName())
+                .commonCode(codeDetailDto.getCommonCode())
+                .build();
+
+        // 새로운 정보로 유저 엔티티 업데이트 및 저장
+        userEntity.updateProfiles(
+                profilesRequestDto.getNickname(),
+                profilesRequestDto.getProfileImgUrl(),
+                codeDetailEntity
         );
+        userRepository.save(userEntity);
     }
 
     public ActivitiesDto getActivities(Long id) throws BaseException {
@@ -204,4 +220,13 @@ public class PatientUserService {
         return new ActivitiesDto();
     }
 
+    private void setRefreshTokenInRedis(RefreshTokenDto refreshToken) {
+
+        redisTemplate.opsForValue().set(
+                "RT:"+SecurityUtil.getCurrentUserId().get(),
+                refreshToken.getRefreshToken(),
+                refreshToken.getRefreshTokenExpiresTime(),
+                TimeUnit.MILLISECONDS
+        );
+    }
 }
