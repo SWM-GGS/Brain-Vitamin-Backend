@@ -58,6 +58,9 @@ public class UserEntity extends BaseEntity {
     @Column(columnDefinition = "INT UNSIGNED default 0 NOT NULL")
     private Integer consecutiveDays;
 
+    @Column(columnDefinition = "INT UNSIGNED default 0 NOT NULL")
+    private Integer todayVitaminCheck;
+
     @ManyToMany
     @JoinTable(
             name = "user_authority",
@@ -76,6 +79,14 @@ public class UserEntity extends BaseEntity {
 
     public void plusConsecutiveDays() {
         this.consecutiveDays++;
+    }
+
+    public void setConsecutiveDays(Integer consecutiveDays) {
+        this.consecutiveDays = consecutiveDays;
+    }
+
+    public void setTodayVitaminCheck(Integer todayVitaminCheck) {
+        this.todayVitaminCheck = todayVitaminCheck;
     }
 
 }
