@@ -97,4 +97,5 @@ public class UserEntity extends BaseEntity {
 
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
+    public void setFontSize(Integer fontSize) { this.fontSize = fontSize; }
 }
