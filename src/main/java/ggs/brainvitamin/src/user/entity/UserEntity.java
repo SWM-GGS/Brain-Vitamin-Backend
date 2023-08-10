@@ -95,4 +95,6 @@ public class UserEntity extends BaseEntity {
         this.educationCode = educationCode;
     }
 
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
 }
