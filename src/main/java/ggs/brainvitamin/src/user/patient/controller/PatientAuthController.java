@@ -3,13 +3,13 @@ package ggs.brainvitamin.src.user.patient.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
-import ggs.brainvitamin.config.BaseResponseStatus;
-import ggs.brainvitamin.src.common.Service.CommonCodeService;
+import ggs.brainvitamin.src.common.service.CommonCodeService;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.user.notification.sms.SmsService;
 import ggs.brainvitamin.src.user.notification.sms.dto.MessageDto;
 import ggs.brainvitamin.src.user.notification.sms.dto.SmsResponseDto;
 import ggs.brainvitamin.src.user.patient.dto.FamilyDto;
+import ggs.brainvitamin.src.user.patient.dto.PatientUserDto;
 import ggs.brainvitamin.src.user.patient.dto.TokenDto;
 import ggs.brainvitamin.src.user.patient.service.PatientFamilyService;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
@@ -133,7 +133,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/reissue-tokens")
-    public BaseResponse<TokenDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
+    public BaseResponse<loginResponseDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
 
         try {
             AccessTokenDto accessToken = tokenDto.getAccessTokenDto();
@@ -144,7 +144,17 @@ public class PatientAuthController {
             if (!StringUtils.hasText(refreshToken.getRefreshToken()))
                 return new BaseResponse<>(EMPTY_REFRESH_TOKEN);
 
-            return new BaseResponse<>(patientUserService.reGenerateTokens(accessToken, refreshToken));
+            TokenDto newTokens = patientUserService.reGenerateTokens(accessToken, refreshToken);
+
+            Long userId = Long.parseLong(SecurityUtil.getCurrentUserId().get());
+            PatientDetailDto patientDetailDto = patientUserService.getPatientUserDetail(userId);
+
+            loginResponseDto loginResponseDto = PatientUserDto.loginResponseDto.builder()
+                    .patientDetailDto(patientDetailDto)
+                    .tokenDto(newTokens)
+                    .build();
+
+            return new BaseResponse<>(loginResponseDto);
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
