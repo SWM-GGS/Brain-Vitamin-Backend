@@ -6,6 +6,7 @@ import ggs.brainvitamin.config.BaseResponseStatus;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.common.service.CommonCodeService;
 import ggs.brainvitamin.src.user.patient.dto.ActivitiesDto;
+import ggs.brainvitamin.src.user.patient.dto.FontSizeDto;
 import ggs.brainvitamin.src.user.patient.dto.PatientUserDto;
 import ggs.brainvitamin.src.user.patient.dto.ProfilesRequestDto;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
@@ -60,7 +61,7 @@ public class PatientUserController {
         }
     }
 
-    @PutMapping("phone-number")
+    @PutMapping("/phone-number")
     public BaseResponse<String> setPhoneNumber(@Valid @RequestBody phoneNumberDto phoneNumberDto) {
 
         try {
@@ -74,4 +75,19 @@ public class PatientUserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    @PutMapping("/font-size")
+    public BaseResponse<String> setFontSize(@Valid @RequestBody FontSizeDto fontSizeDto) {
+
+        try {
+            // 현재 로그인한 유저의 id값 조회
+            String userId = SecurityUtil.getCurrentUserId()
+                    .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
+
+            patientUserService.updateFontSize(Long.parseLong(userId), fontSizeDto.getFontSize());
+            return new BaseResponse<>("글자 크기가 성공적으로 저장되었습니다.");
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
     }
+}

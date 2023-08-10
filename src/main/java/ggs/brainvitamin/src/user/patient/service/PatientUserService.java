@@ -217,6 +217,15 @@ public class PatientUserService {
         userRepository.save(userEntity);
     }
 
+    public void updateFontSize(Long userId, Integer fontSize) {
+
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
+        userEntity.setFontSize(fontSize);
+        userRepository.save(userEntity);
+    }
+
     public ActivitiesDto getActivities(Long id) throws BaseException {
 
         // 최근 일주일 두뇌 비타민 참여 현황 데이터
