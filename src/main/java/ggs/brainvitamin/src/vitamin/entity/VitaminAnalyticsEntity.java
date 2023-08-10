@@ -46,6 +46,9 @@ public class VitaminAnalyticsEntity extends BaseEntity {
     @Column
     private Integer soundScore;
 
+    @Column(columnDefinition = "CHAR(1) NOT NULL")
+    private String finish = "T";
+
     @Builder
     public VitaminAnalyticsEntity(UserEntity user,
                                   Integer memoryScore, Integer attentionScore, Integer orientationScore, Integer visualScore,
@@ -59,5 +62,12 @@ public class VitaminAnalyticsEntity extends BaseEntity {
         this.calculationScore = calculationScore;
         this.executiveScore = executiveScore;
         this.soundScore = soundScore;
+    }
+
+    /**
+     * 비즈니스 로직
+     */
+    public void setFinish(String finish) {
+        this.finish = finish;
     }
 }
