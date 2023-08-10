@@ -206,7 +206,6 @@ public class TokenProvider implements InitializingBean {
 
     public TokenDto reIssueAccessAndRefreshToken(String refreshToken) {
         Authentication authentication = this.getAuthenticationByRefreshToken(refreshToken);
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return new TokenDto(this.createAccessToken(authentication), this.createRefreshToken(authentication));

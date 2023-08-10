@@ -16,6 +16,7 @@ import ggs.brainvitamin.src.user.patient.service.PatientUserService;
 import ggs.brainvitamin.utils.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 import static ggs.brainvitamin.src.user.patient.dto.PatientUserDto.*;
+import static ggs.brainvitamin.src.user.patient.dto.TokenDto.*;
 
 @RestController
 @RequestMapping("/patient")
@@ -124,6 +126,25 @@ public class PatientAuthController {
             patientUserService.logout(tokenDto);
 
             return new BaseResponse<>("회원 탈퇴가 완료되었습니다.");
+
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @PostMapping("/reissue-tokens")
+    public BaseResponse<TokenDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
+
+        try {
+            AccessTokenDto accessToken = tokenDto.getAccessTokenDto();
+            RefreshTokenDto refreshToken = tokenDto.getRefreshTokenDto();
+
+            if (!StringUtils.hasText(accessToken.getAccessToken()))
+                return new BaseResponse<>(EMPTY_ACCESS_TOKEN);
+            if (!StringUtils.hasText(refreshToken.getRefreshToken()))
+                return new BaseResponse<>(EMPTY_REFRESH_TOKEN);
+
+            return new BaseResponse<>(patientUserService.reGenerateTokens(accessToken, refreshToken));
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
