@@ -9,13 +9,10 @@ import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.user.entity.AuthorityEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.patient.dto.ActivitiesDto;
-import ggs.brainvitamin.src.post.repository.PostRepository;
 import ggs.brainvitamin.src.user.patient.dto.TokenDto;
-import ggs.brainvitamin.src.user.patient.dto.UserDto;
 import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -28,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
+import static ggs.brainvitamin.src.user.patient.dto.PatientUserDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +37,7 @@ public class PatientUserService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public void signUp(UserDto.signUpDto signUpDto, CommonCodeDetailDto codeDetailDto) throws BaseException {
+    public Long createPatientUser(signUpDto signUpDto, CommonCodeDetailDto codeDetailDto) throws BaseException {
 
         userRepository.findByPhoneNumberAndStatus(signUpDto.getPhoneNumber(), Status.ACTIVE)
                 .ifPresent(none -> {
@@ -69,10 +67,10 @@ public class PatientUserService {
                 .userTypeCode(userTypeCode)
                 .build();
 
-        userRepository.save(userEntity);
+        return userRepository.save(userEntity).getId();
     }
 
-    public TokenDto login(String phoneNumber) {
+    public loginResponseDto login(String phoneNumber) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(phoneNumber, "");
@@ -84,27 +82,32 @@ public class PatientUserService {
         TokenDto.RefreshTokenDto refreshToken = tokenProvider.createRefreshToken(authentication);
 
         // redis에 refresh 토큰 정보 저장 (만료 시각 아닌 '유효 시간'으로)
-//            redisTemplate.opsForValue().set(
-//                    "RT: "+SecurityUtil.getCurrentUserId().get(),
-//                    refreshToken.getRefreshToken(),
-//                    refreshToken.getRefreshTokenExpiresTime(),
-//                    TimeUnit.MILLISECONDS
-//            );
+            redisTemplate.opsForValue().set(
+                    "RT:"+SecurityUtil.getCurrentUserId().get(),
+                    refreshToken.getRefreshToken(),
+                    refreshToken.getRefreshTokenExpiresTime(),
+                    TimeUnit.MILLISECONDS
+            );
 
-        Optional<String> currentUserId = SecurityUtil.getCurrentUserId();
-        System.out.println("currentUserId = " + currentUserId.get());
+        UserEntity userEntity = userRepository.findById(Long.parseLong(authentication.getName()))
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
-        return new TokenDto(accessToken, refreshToken);
+        PatientDetailDto patientDetailDto = PatientDetailDto.builder()
+                .id(userEntity.getId())
+                .name(userEntity.getName())
+                .nickname(userEntity.getNickname())
+                .fontSize(userEntity.getFontSize())
+                .build();
+
+        return loginResponseDto.builder()
+                .patientDetailDto(patientDetailDto)
+                .tokenDto(new TokenDto(accessToken, refreshToken))
+                .build();
     }
 
     public Optional<UserEntity> getUserWithAuthorities(String phoneNumber) {
-        return userRepository.findOneWithAuthoritiesByPhoneNumber(phoneNumber);
+        return userRepository.findOneWithAuthoritiesByPhoneNumberAndStatus(phoneNumber, Status.ACTIVE);
     }
-
-    public Optional<UserEntity> getMyUserAuthorities() {
-        return SecurityUtil.getCurrentUserId().flatMap(userRepository::findOneWithAuthoritiesByPhoneNumber);
-    }
-
 
     public void logout(TokenDto tokenDto) {
 
@@ -122,6 +125,29 @@ public class PatientUserService {
         // 해당 Access Token 유효시간을 가지고 와서 BlackList에 저장하기
         Long expiration = tokenProvider.getAccessTokenValidityInMilliseconds();
         redisTemplate.opsForValue().set(tokenDto.getAccessTokenDto().getAccessToken(),"logout", expiration, TimeUnit.MILLISECONDS);
+    }
+
+    public void deletePatientUser(Long userId) {
+
+        // 사용자 status를 "INACTIVE"로 변경
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+        userEntity.setStatus(Status.INACTIVE);
+        userRepository.save(userEntity);
+    }
+
+    public PatientDetailDto getPatientUserDetail(Long id) {
+
+        UserEntity user = userRepository.findByIdAndStatus(id, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        return PatientDetailDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .phoneNumber(user.getPhoneNumber())
+                .fontSize(user.getFontSize())
+                .build();
     }
 
     public ActivitiesDto getActivities(Long id) throws BaseException {

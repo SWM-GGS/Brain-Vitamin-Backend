@@ -26,6 +26,7 @@ public enum BaseResponseStatus {
     USER_ALREADY_EXISTS(false, 2011, "이미 가입된 전화번호입니다."),
     PHONENUMBER_NOT_EXISTS(false, 2012, "가입되지 않은 전화번호입니다."),
     INVALID_TOKEN(false, 2013, "유효하지 않은 토큰입니다"),
+    INVALID_LOGIN_INFO(false, 2014, "유효하지 않은 로그인입니다"),
 
 
     // [POST] /users

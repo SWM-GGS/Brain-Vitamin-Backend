@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ggs.brainvitamin.config.BaseResponseStatus.*;
+
 @Component("userDetailsService")
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
@@ -23,9 +25,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String phoneNumber) throws BaseException {
-        return userRepository.findOneWithAuthoritiesByPhoneNumber(phoneNumber)
+        return userRepository.findOneWithAuthoritiesByPhoneNumberAndStatus(phoneNumber, Status.ACTIVE)
                 .map(userEntity -> createUser(phoneNumber, userEntity))
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.PHONENUMBER_NOT_EXISTS));
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
     }
 
     private User createUser(String phoneNumber, UserEntity userEntity) {
