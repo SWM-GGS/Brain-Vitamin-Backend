@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 import static ggs.brainvitamin.src.user.patient.dto.PatientUserDto.*;
+import static ggs.brainvitamin.src.user.patient.dto.TokenDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -78,16 +79,13 @@ public class PatientUserService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        TokenDto.AccessTokenDto accessToken = tokenProvider.createAccessToken(authentication);
-        TokenDto.RefreshTokenDto refreshToken = tokenProvider.createRefreshToken(authentication);
+        AccessTokenDto accessToken = tokenProvider.createAccessToken(authentication);
+        RefreshTokenDto refreshToken = tokenProvider.createRefreshToken(authentication);
 
-        // redis에 refresh 토큰 정보 저장 (만료 시각 아닌 '유효 시간'으로)
-            redisTemplate.opsForValue().set(
-                    "RT:"+SecurityUtil.getCurrentUserId().get(),
-                    refreshToken.getRefreshToken(),
-                    refreshToken.getRefreshTokenExpiresTime(),
-                    TimeUnit.MILLISECONDS
-            );
+        // redis에 refresh 토큰 정보 저장
+        // key: RT:{userId}, value: refreshToken
+        // (만료 시각 아닌 '유효 시간'으로)
+        setRefreshTokenInRedis(refreshToken);
 
         UserEntity userEntity = userRepository.findById(Long.parseLong(authentication.getName()))
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
@@ -112,7 +110,7 @@ public class PatientUserService {
     public void logout(TokenDto tokenDto) {
 
         if (!tokenProvider.isValidAccessToken(tokenDto.getAccessTokenDto().getAccessToken())) {
-            throw new BaseException(BaseResponseStatus.INVALID_TOKEN);
+            throw new BaseException(BaseResponseStatus.INVALID_ACCESS_TOKEN);
         }
 
         Authentication authentication =
@@ -124,7 +122,11 @@ public class PatientUserService {
 
         // 해당 Access Token 유효시간을 가지고 와서 BlackList에 저장하기
         Long expiration = tokenProvider.getAccessTokenValidityInMilliseconds();
-        redisTemplate.opsForValue().set(tokenDto.getAccessTokenDto().getAccessToken(),"logout", expiration, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(
+                tokenDto.getAccessTokenDto().getAccessToken(),
+                "logout",
+                expiration,
+                TimeUnit.MILLISECONDS);
     }
 
     public void deletePatientUser(Long userId) {
@@ -148,6 +150,45 @@ public class PatientUserService {
                 .phoneNumber(user.getPhoneNumber())
                 .fontSize(user.getFontSize())
                 .build();
+    }
+
+    public TokenDto reGenerateTokens(AccessTokenDto accessTokenDto, RefreshTokenDto refreshTokenDto) {
+
+        String refreshToken = refreshTokenDto.getRefreshToken();
+
+        // 리프레시 토큰이 만료되었는지 확인
+        if (tokenProvider.isExpiredRefreshToken(refreshToken)) {
+            throw new BaseException(EXPIRED_REFRESH_TOKEN);
+        }
+
+        // 리프레시 토큰이 유효한지 확인
+        if (tokenProvider.isValidRefreshToken(refreshToken)) {
+
+            // 인증 정보에서 사용자 id를 조회
+            Authentication authentication =
+                    tokenProvider.getAuthenticationByAccessToken(accessTokenDto.getAccessToken());
+            String userId = authentication.getName();
+
+            // 사용자 id를 통해 Redis에서 리프레시 토큰을 조회하여 일치하는지 확인
+            if (redisTemplate.opsForValue().get("RT:"+userId) != null) {
+                // 두 토큰 모두 재생성 후 Redis 업데이트
+                TokenDto newTokens = tokenProvider.reIssueAccessAndRefreshToken(refreshToken);
+                setRefreshTokenInRedis(newTokens.getRefreshTokenDto());
+                return newTokens;
+            }
+        }
+
+        throw new BaseException(INVALID_REFRESH_TOKEN);
+    }
+
+    private void setRefreshTokenInRedis(RefreshTokenDto refreshToken) {
+
+        redisTemplate.opsForValue().set(
+                "RT:"+SecurityUtil.getCurrentUserId().get(),
+                refreshToken.getRefreshToken(),
+                refreshToken.getRefreshTokenExpiresTime(),
+                TimeUnit.MILLISECONDS
+        );
     }
 
     public ActivitiesDto getActivities(Long id) throws BaseException {
