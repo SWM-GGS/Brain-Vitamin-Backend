@@ -6,10 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VitaminAnalyticsRepository extends JpaRepository<VitaminAnalyticsEntity, Long> {
 
     List<VitaminAnalyticsEntity> findTop5ByUserOrderByCreatedAtDesc(UserEntity userEntity);
+
+    Optional<VitaminAnalyticsEntity> findTop1ByUserAndFinishOrderByCreatedAtDesc(UserEntity userEntity, String finish);
 
 }

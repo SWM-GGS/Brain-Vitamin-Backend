@@ -1,6 +1,7 @@
 package ggs.brainvitamin.src.user.repository;
 
 import ggs.brainvitamin.config.Status;
+import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -17,4 +18,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByIdAndStatus(Long userId, Status status);
     Optional<UserEntity> findByPhoneNumberAndStatus(String phoneNumber, Status status);
+
+    List<UserEntity> findAllByUserTypeCodeAndStatus(CommonCodeDetailEntity commonCodeDetailEntity, Status status);
 }

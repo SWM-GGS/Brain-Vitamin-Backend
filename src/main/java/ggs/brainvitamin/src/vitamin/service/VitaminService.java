@@ -292,9 +292,23 @@ public class VitaminService {
             throw new BaseException(INVALID_USERTYPE);
         }
 
-        // 두뇌 비타민을 끝까지 완수한 경우
+        // 두뇌 비타민을 끝까지 완수한 경우, 비타민 연속 수행일 계산
         if (postCogTrainingDto.getFinish()) {
-            userEntity.plusConsecutiveDays();
+            // 두뇌 비타민 연속 수행일이 0인 경우 +1
+            if (userEntity.getConsecutiveDays() == 0) {
+                userEntity.plusConsecutiveDays();
+            }
+            // 0이 아닌 경우, 가장 최신 두뇌 비타민 기록 확인
+            else {
+                Optional<VitaminAnalyticsEntity> vitaminAnalyticsHistory = vitaminAnalyticsRepository.findTop1ByUserAndFinishOrderByCreatedAtDesc(userEntity, "T");
+
+                if (vitaminAnalyticsHistory.isPresent()) {
+                    if (ChronoUnit.DAYS.between(vitaminAnalyticsHistory.get().getCreatedAt().toLocalDate(), LocalDate.now()) >= 1) {
+                        userEntity.plusConsecutiveDays();
+                    }
+                }
+            }
+            userEntity.setTodayVitaminCheck(1);
         }
 
         // 영역별 점수
@@ -349,6 +363,10 @@ public class VitaminService {
                 .executiveScore(executiveScore)
                 .soundScore(soundScore)
                 .build();
+
+        if (!postCogTrainingDto.getFinish()) {
+            vitaminAnalyticsEntity.setFinish("F");
+        }
 
         vitaminAnalyticsRepository.save(vitaminAnalyticsEntity);
 
