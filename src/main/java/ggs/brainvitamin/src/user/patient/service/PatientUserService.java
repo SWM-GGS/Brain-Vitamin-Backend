@@ -127,6 +127,15 @@ public class PatientUserService {
         redisTemplate.opsForValue().set(tokenDto.getAccessTokenDto().getAccessToken(),"logout", expiration, TimeUnit.MILLISECONDS);
     }
 
+    public void deletePatientUser(Long userId) {
+
+        // 사용자 status를 "INACTIVE"로 변경
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+        userEntity.setStatus(Status.INACTIVE);
+        userRepository.save(userEntity);
+    }
+
     public PatientDetailDto getPatientUserDetail(Long id) {
 
         UserEntity user = userRepository.findByIdAndStatus(id, Status.ACTIVE)

@@ -64,7 +64,7 @@ public class GuardianFamilyService {
      * @return
      */
     public FamilyGroupDetailDto findFamilyGroupWithFamilyKey(String familyKey) {
-        FamilyEntity familyEntity = familyRepository.findByFamilyKey(familyKey)
+        FamilyEntity familyEntity = familyRepository.findByFamilyKeyAndStatus(familyKey, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(INVALID_FAMILY_KEY));
 
         List<FamilyMemberEntity> familyMemberEntityList = familyMemberRepository.findTop2ByFamilyId(familyEntity.getId());

@@ -16,4 +16,6 @@ public interface FamilyMemberRepository extends JpaRepository<FamilyMemberEntity
     List<FamilyMemberEntity> findTop2ByFamilyId(Long familyId);
     Optional<FamilyMemberEntity> findByUserIdAndFamilyIdAndStatus(Long userId, Long familyId, Status status);
 
+    List<FamilyMemberEntity> findByFamilyIdAndStatus(Long familyId, Status status);
+
 }

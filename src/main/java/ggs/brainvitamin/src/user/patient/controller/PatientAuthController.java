@@ -3,6 +3,7 @@ package ggs.brainvitamin.src.user.patient.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
+import ggs.brainvitamin.config.BaseResponseStatus;
 import ggs.brainvitamin.src.common.Service.CommonCodeService;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.user.notification.sms.SmsService;
@@ -12,6 +13,7 @@ import ggs.brainvitamin.src.user.patient.dto.FamilyDto;
 import ggs.brainvitamin.src.user.patient.dto.TokenDto;
 import ggs.brainvitamin.src.user.patient.service.PatientFamilyService;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
+import ggs.brainvitamin.utils.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +27,7 @@ import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import static ggs.brainvitamin.config.BaseResponseStatus.*;
 import static ggs.brainvitamin.src.user.patient.dto.PatientUserDto.*;
 
 @RestController
@@ -96,6 +99,31 @@ public class PatientAuthController {
         try {
             patientUserService.logout(tokenDto);
             return new BaseResponse<>("로그아웃이 완료되었습니다.");
+
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @PostMapping("/signout")
+    public BaseResponse<String> signOut(@Valid @RequestBody TokenDto tokenDto) {
+
+        try {
+            String userId = SecurityUtil.getCurrentUserId()
+                    .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
+
+            // 사용자 비활성화
+            patientUserService.deletePatientUser(Long.parseLong(userId));
+            // 가족 그룹 비활성화 및 그룹 멤버 비활성화
+            FamilyDto familyInfo = patientFamilyService.getFamilyInfo(Long.parseLong(userId));
+            patientFamilyService.deleteFamily(familyInfo.getId());
+
+            // 환자 가족 내 커뮤니티 전체 비활성화 작업 추가 예정
+
+            // 탈퇴 작업 완료 후 로그아웃 처리
+            patientUserService.logout(tokenDto);
+
+            return new BaseResponse<>("회원 탈퇴가 완료되었습니다.");
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());

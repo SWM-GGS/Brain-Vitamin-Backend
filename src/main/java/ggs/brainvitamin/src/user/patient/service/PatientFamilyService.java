@@ -30,7 +30,8 @@ public class PatientFamilyService {
         String familyKey;
         while (true) {
             familyKey = generateFamilyKey();
-            if (!familyRepository.findByFamilyKey(familyKey).isPresent()) break;
+            if (!familyRepository.findByFamilyKeyAndStatus(familyKey, Status.ACTIVE).isPresent())
+                break;
         }
 
         FamilyEntity newFamily = FamilyEntity.builder()
@@ -87,5 +88,22 @@ public class PatientFamilyService {
         }
 
         return familyKey.toString();
+    }
+
+    public void deleteFamily(Long familyId) {
+
+        // 가족 그룹 비활성화
+        FamilyEntity familyEntity = familyRepository.findByIdAndStatus(familyId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.FAMILY_NOT_EXISTS));
+
+        familyEntity.setStatus(Status.INACTIVE);
+        familyRepository.save(familyEntity);
+
+        // 가족 그룹 내 모든 멤버 비활성화
+        List<FamilyMemberEntity> familyMemberEntityList = familyMemberRepository.findByFamilyIdAndStatus(familyId, Status.ACTIVE);
+        for (FamilyMemberEntity familyMemberEntity : familyMemberEntityList) {
+            familyMemberEntity.setStatus(Status.INACTIVE);
+            familyMemberRepository.save(familyMemberEntity);
+        }
     }
 }
