@@ -44,7 +44,7 @@ public class VitaminController {
      * 인지 선별 검사를 위한 회원 정보 받기
      */
     @PostMapping("/vitamins/user-details")
-    public BaseResponse<String> setUserDetails(@RequestBody PostUserDetailDto postUserDetailDto) {
+    public BaseResponse<String> setUserDetails(@Valid @RequestBody PostUserDetailDto postUserDetailDto) {
         try {
             Long userId = getUserId();
 
@@ -109,7 +109,7 @@ public class VitaminController {
      * 인지 선별검사 제출
      */
     @PostMapping("/vitamins/screening-test")
-    public BaseResponse<Map<String, Object>> submitScreeningTest(@RequestBody PostScreeningTestDto postScreeningTestDto) {
+    public BaseResponse<Map<String, Object>> submitScreeningTest(@Valid @RequestBody PostScreeningTestDto postScreeningTestDto) {
         try {
             Long userId = getUserId();
 
