@@ -1,4 +1,4 @@
-package ggs.brainvitamin.src.common.Service;
+package ggs.brainvitamin.src.common.service;
 
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
