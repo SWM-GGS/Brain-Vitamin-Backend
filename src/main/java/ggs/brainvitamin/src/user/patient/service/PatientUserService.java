@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -204,6 +205,15 @@ public class PatientUserService {
                 profilesRequestDto.getProfileImgUrl(),
                 codeDetailEntity
         );
+        userRepository.save(userEntity);
+    }
+
+    public void updatePhoneNumber(Long userId, String phoneNumber) {
+
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
+        userEntity.setPhoneNumber(phoneNumber);
         userRepository.save(userEntity);
     }
 
