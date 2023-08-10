@@ -28,7 +28,7 @@ public class PatientUserDto {
     }
 
     @Data
-    public static class loginRequestDto {
+    public static class phoneNumberDto {
 
         private String phoneNumber;
     }

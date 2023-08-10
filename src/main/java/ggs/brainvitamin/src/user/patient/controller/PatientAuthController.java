@@ -80,10 +80,10 @@ public class PatientAuthController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<loginResponseDto> login(@RequestBody loginRequestDto loginDto) {
+    public BaseResponse<loginResponseDto> login(@RequestBody phoneNumberDto phoneNumberDto) {
         try {
             // 로그인 후 사용자 정보 조회
-            loginResponseDto loginResponseDto = patientUserService.login(loginDto.getPhoneNumber());
+            loginResponseDto loginResponseDto = patientUserService.login(phoneNumberDto.getPhoneNumber());
             // 사용자 정보 바탕으로 가족 코드 조회
             FamilyDto familyInfo = patientFamilyService.getFamilyInfo(loginResponseDto.getPatientDetailDto().getId());
             loginResponseDto.getPatientDetailDto().setFamilyKey(familyInfo.getFamilyKey());
@@ -146,8 +146,10 @@ public class PatientAuthController {
 
             TokenDto newTokens = patientUserService.reGenerateTokens(accessToken, refreshToken);
 
-            Long userId = Long.parseLong(SecurityUtil.getCurrentUserId().get());
-            PatientDetailDto patientDetailDto = patientUserService.getPatientUserDetail(userId);
+            String userId = SecurityUtil.getCurrentUserId()
+                    .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
+
+            PatientDetailDto patientDetailDto = patientUserService.getPatientUserDetail(Long.parseLong(userId));
 
             loginResponseDto loginResponseDto = PatientUserDto.loginResponseDto.builder()
                     .patientDetailDto(patientDetailDto)
