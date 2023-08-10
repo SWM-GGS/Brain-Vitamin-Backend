@@ -25,8 +25,7 @@ public enum BaseResponseStatus {
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
     USER_ALREADY_EXISTS(false, 2011, "이미 가입된 전화번호입니다."),
     PHONENUMBER_NOT_EXISTS(false, 2012, "가입되지 않은 전화번호입니다."),
-    INVALID_TOKEN(false, 2013, "유효하지 않은 토큰입니다"),
-    INVALID_LOGIN_INFO(false, 2014, "유효하지 않은 로그인입니다"),
+    INVALID_LOGIN_INFO(false, 2015, "유효하지 않은 로그인입니다"),
 
 
     // [POST] /users
@@ -55,6 +54,13 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_LOGIN_ID(false, 2090, "아이디를 입력해주세요."),
     POST_USERS_OVER_LENGTH_LOGIN_ID(false, 2091, "아이디는 3자리 이상 20자리 이하입니다."),
 
+    // Token 관련 오류
+    INVALID_ACCESS_TOKEN(false, 2100, "유효하지 않은 액세스 토큰입니다"),
+    INVALID_REFRESH_TOKEN(false, 2101, "유효하지 않은 리프레시 토큰입니다"),
+    EMPTY_ACCESS_TOKEN(false, 2102, "액세스 토큰이 비어있습니다."),
+    EMPTY_REFRESH_TOKEN(false, 2103, "리프레시 토큰이 비어있습니다."),
+    EXPIRED_ACCESS_TOKEN(false, 2104, "만료된 액세스 토큰 입니다."),
+    EXPIRED_REFRESH_TOKEN(false, 2105, "만료된 리프레시 토큰 입니다."),
 
     // 신고 관련 요청 오류
     INVALID_REPORT_TYPE(false,2190,"잘못된 신고 형식입니다."),
