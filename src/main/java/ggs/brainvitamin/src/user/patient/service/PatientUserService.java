@@ -19,7 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +39,7 @@ public class PatientUserService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public Long createPatientUser(signUpDto signUpDto, CommonCodeDetailDto codeDetailDto) throws BaseException {
+    public Long createPatientUser(SignUpDto signUpDto, CommonCodeDetailDto codeDetailDto) throws BaseException {
 
         userRepository.findByPhoneNumberAndStatus(signUpDto.getPhoneNumber(), Status.ACTIVE)
                 .ifPresent(none -> {
@@ -73,7 +72,7 @@ public class PatientUserService {
         return userRepository.save(userEntity).getId();
     }
 
-    public loginResponseDto login(String phoneNumber) {
+    public LoginResponseDto login(String phoneNumber) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(phoneNumber, "");
@@ -99,7 +98,7 @@ public class PatientUserService {
                 .fontSize(userEntity.getFontSize())
                 .build();
 
-        return loginResponseDto.builder()
+        return LoginResponseDto.builder()
                 .patientDetailDto(patientDetailDto)
                 .tokenDto(new TokenDto(accessToken, refreshToken))
                 .build();
@@ -224,19 +223,6 @@ public class PatientUserService {
 
         userEntity.setFontSize(fontSize);
         userRepository.save(userEntity);
-    }
-
-    public ActivitiesDto getActivities(Long id) throws BaseException {
-
-        // 최근 일주일 두뇌 비타민 참여 현황 데이터
-
-        // 최근 일주일 간 영역별 인지 능력 데이터 (두뇌 비타민 결과)
-
-        // 그 지난 일주일 간 영역별 인지 능력 데이터 (두뇌 비타민 결과)
-
-        // 가장 최근 인지선별검사 결과 및 해석
-
-        return new ActivitiesDto();
     }
 
     private void setRefreshTokenInRedis(RefreshTokenDto refreshToken) {

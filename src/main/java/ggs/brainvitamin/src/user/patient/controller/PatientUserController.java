@@ -2,21 +2,24 @@ package ggs.brainvitamin.src.user.patient.controller;
 
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
-import ggs.brainvitamin.config.BaseResponseStatus;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.common.service.CommonCodeService;
-import ggs.brainvitamin.src.user.patient.dto.ActivitiesDto;
 import ggs.brainvitamin.src.user.patient.dto.FontSizeDto;
 import ggs.brainvitamin.src.user.patient.dto.PatientUserDto;
 import ggs.brainvitamin.src.user.patient.dto.ProfilesRequestDto;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
+import ggs.brainvitamin.src.vitamin.service.ScreeningTestHistoryService;
+import ggs.brainvitamin.src.vitamin.service.VitaminAnalyticsService;
 import ggs.brainvitamin.utils.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
-import static ggs.brainvitamin.src.user.patient.dto.PatientUserDto.*;
+import static ggs.brainvitamin.src.user.patient.dto.ActivitiesDto.*;
 
 @RestController
 @RequestMapping("/patient")
@@ -25,19 +28,38 @@ public class PatientUserController {
 
     private final PatientUserService patientUserService;
     private final CommonCodeService commonCodeService;
-
-//    @GetMapping("/")
-//    public BaseResponse<ActivitiesDto> getMain() {
-//        try {
-//
-//        }
-//    }
+    private final ScreeningTestHistoryService screeningTestHistoryService;
+    private final VitaminAnalyticsService vitaminAnalyticsService;
 
     @GetMapping("/activities")
-    public BaseResponse<ActivitiesDto> getActivities() {
+    public BaseResponse<ActivitiesResponseDto> getActivities() {
         try {
-            Long userId = Long.valueOf(1);  // 현재 접속 중인 User의 Id 받아오기
-            return new BaseResponse<>(patientUserService.getActivities(userId));
+            String currentUserId = SecurityUtil.getCurrentUserId()
+                    .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+            Long userId = Long.parseLong(currentUserId);
+
+            LocalDateTime today = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+            // 이번주 간 비타민 참여 여부 조회
+            GetWeeklyVitaminDto weeklyVitaminDto =
+                    vitaminAnalyticsService.getWeeklyVitaminAttendance(userId, today);
+
+            // 지난주 대비 인지능력 변화 조회
+            GetChangesFromLastWeekDto changesFromLastWeekDto =
+                    vitaminAnalyticsService.getChangesFromLastWeek(userId, today);
+
+            // 가장 최근 선별검사 결과 조회
+            GetScreeningTestHistoryDto screeningTestHistoryDto =
+                    screeningTestHistoryService.getScreeningTestHistory(userId);
+
+            // ResponseDto 구성
+            ActivitiesResponseDto activitiesResponseDtO = ActivitiesResponseDto.builder()
+                    .weeklyVitaminDto(weeklyVitaminDto)
+                    .changesFromLastWeekDto(changesFromLastWeekDto)
+                    .screeningTestHistoryDto(screeningTestHistoryDto)
+                    .build();
+
+            return new BaseResponse<>(activitiesResponseDtO);
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
@@ -62,7 +84,7 @@ public class PatientUserController {
     }
 
     @PutMapping("/phone-number")
-    public BaseResponse<String> setPhoneNumber(@Valid @RequestBody phoneNumberDto phoneNumberDto) {
+    public BaseResponse<String> setPhoneNumber(@Valid @RequestBody PatientUserDto.PhoneNumberDto phoneNumberDto) {
 
         try {
             // 현재 로그인한 유저의 id값 조회
