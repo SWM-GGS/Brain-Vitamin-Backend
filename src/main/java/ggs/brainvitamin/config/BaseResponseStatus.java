@@ -62,6 +62,9 @@ public enum BaseResponseStatus {
     EXPIRED_ACCESS_TOKEN(false, 2104, "만료된 액세스 토큰 입니다."),
     EXPIRED_REFRESH_TOKEN(false, 2105, "만료된 리프레시 토큰 입니다."),
 
+    // 선별 검사 관련 오류
+    HISTORY_NOT_EXISTS(false, 2110, "선별검사 결과가 존재하지 않습니다."),
+
     // 신고 관련 요청 오류
     INVALID_REPORT_TYPE(false,2190,"잘못된 신고 형식입니다."),
 
