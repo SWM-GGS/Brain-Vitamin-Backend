@@ -60,7 +60,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/signup")
-    public BaseResponse<loginResponseDto> signUp(@Valid @RequestBody signUpDto signUpDto) {
+    public BaseResponse<LoginResponseDto> signUp(@Valid @RequestBody PatientUserDto.SignUpDto signUpDto) {
         try {
             // 함께 저장할 공통코드 정보 조회
             CommonCodeDetailDto codeDetailDto = commonCodeService.getCodeWithCodeDetailName("환자");
@@ -80,10 +80,10 @@ public class PatientAuthController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<loginResponseDto> login(@RequestBody phoneNumberDto phoneNumberDto) {
+    public BaseResponse<LoginResponseDto> login(@RequestBody PhoneNumberDto phoneNumberDto) {
         try {
             // 로그인 후 사용자 정보 조회
-            loginResponseDto loginResponseDto = patientUserService.login(phoneNumberDto.getPhoneNumber());
+            LoginResponseDto loginResponseDto = patientUserService.login(phoneNumberDto.getPhoneNumber());
             // 사용자 정보 바탕으로 가족 코드 조회
             FamilyDto familyInfo = patientFamilyService.getFamilyInfo(loginResponseDto.getPatientDetailDto().getId());
             loginResponseDto.getPatientDetailDto().setFamilyKey(familyInfo.getFamilyKey());
@@ -133,7 +133,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/reissue-tokens")
-    public BaseResponse<loginResponseDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
+    public BaseResponse<LoginResponseDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
 
         try {
             AccessTokenDto accessToken = tokenDto.getAccessTokenDto();
@@ -151,7 +151,7 @@ public class PatientAuthController {
 
             PatientDetailDto patientDetailDto = patientUserService.getPatientUserDetail(Long.parseLong(userId));
 
-            loginResponseDto loginResponseDto = PatientUserDto.loginResponseDto.builder()
+            LoginResponseDto loginResponseDto = LoginResponseDto.builder()
                     .patientDetailDto(patientDetailDto)
                     .tokenDto(newTokens)
                     .build();

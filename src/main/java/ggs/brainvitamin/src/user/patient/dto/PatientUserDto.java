@@ -19,7 +19,7 @@ public class PatientUserDto {
 
     @Data
     @Builder
-    public static class signUpDto {
+    public static class SignUpDto {
 
         private String name;
         private String nickname;
@@ -28,14 +28,14 @@ public class PatientUserDto {
     }
 
     @Data
-    public static class phoneNumberDto {
+    public static class PhoneNumberDto {
 
         private String phoneNumber;
     }
 
     @Data
     @Builder
-    public static class loginResponseDto {
+    public static class LoginResponseDto {
 
         private PatientDetailDto patientDetailDto;
         private TokenDto tokenDto;
@@ -43,7 +43,7 @@ public class PatientUserDto {
 
     @Data
     @Builder
-    public static class startVitaminDto {
+    public static class StartVitaminDto {
 
         private String birthDate;
         private String education;
