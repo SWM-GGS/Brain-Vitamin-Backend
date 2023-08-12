@@ -8,6 +8,10 @@ import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.service.VitaminService;
 import ggs.brainvitamin.utils.SecurityUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,7 @@ import java.util.Map;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
+@Tag(name = "Patient", description = "Patient API")
 @RestController
 @RequestMapping("/patient")
 @RequiredArgsConstructor
@@ -27,6 +32,7 @@ public class VitaminController {
     /**
      * 환자 홈 화면 조회
      */
+    @Operation(summary = "환자 홈 화면 조회", description = "")
     @GetMapping("")
     public BaseResponse<GetPatientHomeDto> getPatientHome() {
         try {
@@ -43,6 +49,7 @@ public class VitaminController {
     /**
      * 인지 선별 검사를 위한 회원 정보 받기
      */
+    @Operation(summary = "인지 선별 검사를 위한 회원 정보 받기", description = "")
     @PostMapping("/vitamins/user-details")
     public BaseResponse<String> setUserDetails(@Valid @RequestBody PostUserDetailDto postUserDetailDto) {
         try {
@@ -58,8 +65,8 @@ public class VitaminController {
 
     /**
      * 두뇌 비타민 인지 향상 게임 데이터 조회
-     * @return List<GetCogTrainingDto>
      */
+    @Operation(summary = "두뇌 비타민 인지 향상 게임 데이터 조회", description = "")
     @GetMapping("/vitamins/cog-training")
     public BaseResponse<List<Map<String, Object>>> getCogTraining() {
         try {
@@ -76,6 +83,7 @@ public class VitaminController {
     /**
      * 두뇌 비타민 중단 및 종료
      */
+    @Operation(summary = "두뇌 비타민 중단 및 종료", description = "")
     @PostMapping("/vitamins/cog-training")
     public BaseResponse<String> determinateCogTraining(@Valid @RequestBody PostCogTrainingDto postCogTrainingDto) {
         try {
@@ -92,6 +100,7 @@ public class VitaminController {
     /**
      * 인지 선별검사 질문 조회
      */
+    @Operation(summary = "인지 선별검사 질문 조회", description = "")
     @GetMapping("/vitamins/screening-test")
     public BaseResponse<List<Map<String, Object>>> getScreeningTest() {
         try {
@@ -108,6 +117,7 @@ public class VitaminController {
     /**
      * 인지 선별검사 제출
      */
+    @Operation(summary = "인지 선별검사 제출", description = "")
     @PostMapping("/vitamins/screening-test")
     public BaseResponse<Map<String, Object>> submitScreeningTest(@Valid @RequestBody PostScreeningTestDto postScreeningTestDto) {
         try {
