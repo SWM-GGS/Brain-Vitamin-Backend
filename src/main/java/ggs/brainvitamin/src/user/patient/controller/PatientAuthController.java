@@ -139,13 +139,16 @@ public class PatientAuthController {
             AccessTokenDto accessToken = tokenDto.getAccessTokenDto();
             RefreshTokenDto refreshToken = tokenDto.getRefreshTokenDto();
 
+            // 두 토큰이 모두 존재하는지 확인
             if (!StringUtils.hasText(accessToken.getAccessToken()))
                 return new BaseResponse<>(EMPTY_ACCESS_TOKEN);
             if (!StringUtils.hasText(refreshToken.getRefreshToken()))
                 return new BaseResponse<>(EMPTY_REFRESH_TOKEN);
 
+            // 토큰 재생성
             TokenDto newTokens = patientUserService.reGenerateTokens(accessToken, refreshToken);
 
+            // 리프레시된 인증 정보를 바탕으로 다시 사용자 정보를 조회해서 반환
             String userId = SecurityUtil.getCurrentUserId()
                     .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
 

@@ -78,7 +78,6 @@ public class SecurityConfig {
                                 .requestMatchers("/guardian/signup").permitAll()
                                 .requestMatchers("/guardian/login").permitAll()
                                 .requestMatchers("/guardian/sms").permitAll()
-                                .requestMatchers("reissue-token").permitAll()
                                 .requestMatchers("/swagger-resources/**").permitAll()
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
