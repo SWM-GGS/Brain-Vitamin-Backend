@@ -13,6 +13,7 @@ import ggs.brainvitamin.src.vitamin.service.VitaminAnalyticsService;
 import ggs.brainvitamin.utils.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ public class PatientUserController {
     private final VitaminAnalyticsService vitaminAnalyticsService;
 
     @GetMapping("/activities")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
     public BaseResponse<ActivitiesResponseDto> getActivities() {
         try {
             String currentUserId = SecurityUtil.getCurrentUserId()
@@ -67,6 +69,7 @@ public class PatientUserController {
     }
 
     @PutMapping("/profiles")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
     public BaseResponse<String> setProfilesInfo(
             @Valid @RequestBody ProfilesRequestDto profilesRequestDto) {
 
@@ -86,6 +89,7 @@ public class PatientUserController {
     }
 
     @PutMapping("/phone-number")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
     public BaseResponse<String> setPhoneNumber(@Valid @RequestBody PatientUserDto.PhoneNumberDto phoneNumberDto) {
 
         try {
@@ -103,6 +107,7 @@ public class PatientUserController {
     }
 
     @PutMapping("/font-size")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
     public BaseResponse<String> setFontSize(@Valid @RequestBody FontSizeDto fontSizeDto) {
 
         try {

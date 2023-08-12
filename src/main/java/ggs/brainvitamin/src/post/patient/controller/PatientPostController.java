@@ -7,6 +7,7 @@ import ggs.brainvitamin.src.post.patient.service.PatientEmotionService;
 import ggs.brainvitamin.src.post.patient.service.PatientPostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,6 +23,7 @@ public class PatientPostController {
      * 환자용앱 우리 가족이야기 메인 페이지 조회
      */
     @GetMapping("/{familyId}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
     public BaseResponse<PostMainDto> getFamilyStoriesMain(@PathVariable("familyId") Long familyId) {
         try {
             return new BaseResponse<>(patientPostService.getFamilyStoriesMain(familyId));
@@ -35,6 +37,7 @@ public class PatientPostController {
      * 환자용앱 우리가족 이야기 특정 게시글 조회
      */
     @GetMapping("/{familyId}/{postId}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
     public BaseResponse<PostDetailDto> getFamilyStoriesPost(@PathVariable("postId") Long postId) {
         try {
             return new BaseResponse<>(patientPostService.getFamilyStoriesPost(postId));
@@ -50,6 +53,7 @@ public class PatientPostController {
      * 환자용앱 특정 게시글에 감정표현 하나 추가
      */
     @PostMapping("/{familyId}/{postId}/emotion")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
     public BaseResponse<String> postEmotion(@PathVariable("postId") Long postId,
                                             @Valid @RequestBody EmotionIdDto emotionIdDto) {
         try {
@@ -69,6 +73,7 @@ public class PatientPostController {
      * 환자용앱 특정 게시글 감정표현 취소
      */
     @DeleteMapping("{familyId}/{postId}/emotion")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
     public BaseResponse<String> deleteEmotion(@PathVariable("postId") Long postId,
                                               @Valid @RequestBody EmotionIdDto emotionIdDto) {
         try {
