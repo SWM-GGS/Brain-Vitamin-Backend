@@ -1,5 +1,6 @@
 package ggs.brainvitamin.src.vitamin.service;
 
+import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.vitamin.entity.VitaminAnalyticsEntity;
 import ggs.brainvitamin.src.vitamin.repository.VitaminAnalyticsRepository;
@@ -29,7 +30,15 @@ public class VitaminAnalyticsService {
         LocalDateTime startDate = DateUtil.getDateOfThisMonday(today);
 
         List<VitaminAnalyticsEntity> vitaminHistory =
-                vitaminAnalyticsRepository.findByUserAndFinishAndCreatedAtBetweenOrderByCreatedAt(userEntity, "T", startDate, endDate);
+                vitaminAnalyticsRepository
+                        .findByUserAndFinishAndStatusAndCreatedAtBetweenOrderByCreatedAt(
+                                userEntity,
+                                "T",
+                                Status.ACTIVE,
+                                startDate,
+                                endDate
+                );
+
         List<Boolean> weeklyVitaminAttendanceList = new ArrayList<>(Collections.nCopies(7, false));
 
         for (VitaminAnalyticsEntity vitaminAnalyticsEntity : vitaminHistory) {
@@ -57,14 +66,31 @@ public class VitaminAnalyticsService {
         LocalDateTime endDate = today;
         LocalDateTime startDate = DateUtil.getDateOfThisMonday(today);
         List<VitaminAnalyticsEntity> thisWeekHistory =
-                vitaminAnalyticsRepository.findByUserAndFinishAndCreatedAtBetweenOrderByCreatedAt(userEntity, "T", startDate, endDate);
+                vitaminAnalyticsRepository
+                        .findByUserAndFinishAndStatusAndCreatedAtBetweenOrderByCreatedAt(
+                                userEntity,
+                                "T",
+                                Status.ACTIVE,
+                                startDate,
+                                endDate
+                        );
 
         // 지난주 월요일부터 저번주 일요일까지의 기록 조회
         endDate = startDate.minusDays(1);
         startDate = startDate.minusDays(8);
         List<VitaminAnalyticsEntity> lastWeekHistory =
-                vitaminAnalyticsRepository.findByUserAndFinishAndCreatedAtBetweenOrderByCreatedAt(userEntity, "T", startDate, endDate);
+                vitaminAnalyticsRepository
+                        .findByUserAndFinishAndStatusAndCreatedAtBetweenOrderByCreatedAt(
+                                userEntity,
+                                "T",
+                                Status.ACTIVE,
+                                startDate,
+                                endDate
+                        );
 
+        // 지난 주 혹은 이번 주 기록이 없으면 return null
+        if (thisWeekHistory.isEmpty() || lastWeekHistory.isEmpty())
+            return null;
 
         double[] thisWeekAverage = calcAveragesOfEachArea(thisWeekHistory);
         double[] lastWeekAverage = calcAveragesOfEachArea(lastWeekHistory);

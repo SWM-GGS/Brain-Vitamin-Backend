@@ -1,5 +1,6 @@
 package ggs.brainvitamin.src.vitamin.service;
 
+import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.vitamin.entity.ScreeningTestHistoryEntity;
 import ggs.brainvitamin.src.vitamin.repository.ScreeningTestHistoryRepository;
@@ -29,7 +30,7 @@ public class ScreeningTestHistoryService {
                 .build();
 
         Optional<ScreeningTestHistoryEntity> historyEntityOptional =
-                screeningTestHistoryRepository.findTop1ByUserOrderByCreatedAtDesc(userEntity);
+                screeningTestHistoryRepository.findTop1ByUserAndStatusOrderByCreatedAtDesc(userEntity, Status.ACTIVE);
 
         if (historyEntityOptional.isEmpty()) {
             return null;

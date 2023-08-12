@@ -1,5 +1,6 @@
 package ggs.brainvitamin.src.vitamin.repository;
 
+import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.vitamin.entity.VitaminAnalyticsEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,5 +16,11 @@ public interface VitaminAnalyticsRepository extends JpaRepository<VitaminAnalyti
     List<VitaminAnalyticsEntity> findTop5ByUserOrderByCreatedAtDesc(UserEntity userEntity);
 
     Optional<VitaminAnalyticsEntity> findTop1ByUserAndFinishOrderByCreatedAtDesc(UserEntity userEntity, String finish);
-    List<VitaminAnalyticsEntity> findByUserAndFinishAndCreatedAtBetweenOrderByCreatedAt(UserEntity user, String finish, LocalDateTime startDate, LocalDateTime endDate);
+    List<VitaminAnalyticsEntity> findByUserAndFinishAndStatusAndCreatedAtBetweenOrderByCreatedAt(UserEntity user,
+                                                                                                 String finish,
+                                                                                                 Status status,
+                                                                                                 LocalDateTime startDate,
+                                                                                                 LocalDateTime endDate);
+
+
 }
