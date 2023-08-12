@@ -68,7 +68,7 @@ public class VitaminService {
         else {
             getPatientHomeDto.setFirst(false);
 
-            Optional<ScreeningTestHistoryEntity> screeningTestHistoryEntity = screeningTestHistoryRepository.findTop1ByUserOrderByCreatedAtDesc(userEntity);
+            Optional<ScreeningTestHistoryEntity> screeningTestHistoryEntity = screeningTestHistoryRepository.findTop1ByUserAndStatusOrderByCreatedAtDesc(userEntity, Status.ACTIVE);
 
             // 인지 선별 검사가 처음인 경우
             if (screeningTestHistoryEntity.isEmpty()) {

@@ -94,7 +94,9 @@ public class PatientUserController {
                     .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
             // 전화번호 업데이트
             patientUserService.updatePhoneNumber(Long.parseLong(userId), phoneNumberDto.getPhoneNumber());
+
             return new BaseResponse<>("전화번호가 성공적으로 저장되었습니다.");
+
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
