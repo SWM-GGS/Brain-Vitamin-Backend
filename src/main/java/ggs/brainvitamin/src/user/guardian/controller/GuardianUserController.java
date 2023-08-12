@@ -5,6 +5,8 @@ import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.post.patient.dto.EmotionIdDto;
 import ggs.brainvitamin.src.user.guardian.dto.*;
 import ggs.brainvitamin.src.user.guardian.service.GuardianFamilyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/guardian")
 @RequiredArgsConstructor
+@Tag(name = "Guardian", description = "Guardian API")
 public class GuardianUserController {
 
     private final GuardianFamilyService guardianFamilyService;
@@ -24,6 +27,7 @@ public class GuardianUserController {
      * 가족 그룹 리스트 조회 함수
      */
     @GetMapping("/family-group")
+    @Operation(summary = "환자 가입된 가족 그룹 리스트 조회", description = "")
     public BaseResponse<List<FamilyGroupPreviewDto>> getFamilyGroupList() {
         try {
             Long userId = Long.parseLong("2");  // 인증 기능 추가 시 구현 예정
@@ -35,6 +39,7 @@ public class GuardianUserController {
     }
 
     @GetMapping("/family-group/{familyKey}")
+    @Operation(summary = "보호자 가족 그룹 상세정보 조회", description = "")
     public BaseResponse<FamilyGroupDetailDto> getFamilyGroupDetail(@PathVariable("familyKey") String familyKey) {
         try {
             return new BaseResponse<>(guardianFamilyService.findFamilyGroupWithFamilyKey(familyKey));
@@ -49,6 +54,7 @@ public class GuardianUserController {
      * @return
      */
     @PostMapping("/family-group")
+    @Operation(summary = "보호자 가족 그룹 가입", description = "")
     public BaseResponse<String> postJoinFamilyGroup(@Valid @RequestBody FamilyGroupJoinDto familyGroupJoinDto) {
         try {
             Long userId = Long.parseLong("2"); // 인증 기능 구현 후 추가 예정
@@ -66,6 +72,7 @@ public class GuardianUserController {
      * @return
      */
     @DeleteMapping("/family-group")
+    @Operation(summary = "보호자 가족 그룹 탈퇴", description = "")
     public BaseResponse<String> deleteJoinedFamilyGroup(@Valid @RequestBody FamilyGroupQuitDto familyGroupQuitDto) {
         try {
             Long userId = Long.parseLong("2"); // 인증 기능 구현 후 추가 예정
@@ -78,6 +85,7 @@ public class GuardianUserController {
     }
 
     @PutMapping("/family-group/profile")
+    @Operation(summary = "보호자 가족 그룹 프로필 이미지 수정", description = "")
     public BaseResponse<String> postFamilyGroupProfile(@Valid @RequestBody FamilyGroupProfileDto familyGroupProfileDto) {
         try {
             Long userId = Long.parseLong("2"); // 인증 기능 구현 후 추가 예정
