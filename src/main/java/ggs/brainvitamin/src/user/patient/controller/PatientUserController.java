@@ -35,7 +35,7 @@ public class PatientUserController {
     public BaseResponse<ActivitiesResponseDto> getActivities() {
         try {
             String currentUserId = SecurityUtil.getCurrentUserId()
-                    .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+                    .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
             Long userId = Long.parseLong(currentUserId);
 
             LocalDateTime today = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
@@ -71,7 +71,9 @@ public class PatientUserController {
             @Valid @RequestBody ProfilesRequestDto profilesRequestDto) {
 
         try {
-            Long userId = Long.parseLong(SecurityUtil.getCurrentUserId().get());
+            Long userId = Long.parseLong(SecurityUtil.getCurrentUserId()
+                    .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO)));
+
             CommonCodeDetailDto codeDetailDto =
                     commonCodeService.getCodeWithCodeDetailName(profilesRequestDto.getEducation());
             patientUserService.updateProfilesInfo(userId, profilesRequestDto, codeDetailDto);

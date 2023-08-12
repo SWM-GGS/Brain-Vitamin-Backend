@@ -227,8 +227,11 @@ public class PatientUserService {
 
     private void setRefreshTokenInRedis(RefreshTokenDto refreshToken) {
 
+        String userId = SecurityUtil.getCurrentUserId()
+                .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
+
         redisTemplate.opsForValue().set(
-                "RT:"+SecurityUtil.getCurrentUserId().get(),
+                "RT:"+userId,
                 refreshToken.getRefreshToken(),
                 refreshToken.getRefreshTokenExpiresTime(),
                 TimeUnit.MILLISECONDS

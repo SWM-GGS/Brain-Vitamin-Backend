@@ -123,7 +123,7 @@ public class VitaminController {
 
     private static Long getUserId() {
         String currentUserId = SecurityUtil.getCurrentUserId()
-                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+                .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
 
         return Long.parseLong(currentUserId);
     }
