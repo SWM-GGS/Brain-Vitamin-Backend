@@ -11,6 +11,8 @@ import ggs.brainvitamin.src.user.patient.service.PatientUserService;
 import ggs.brainvitamin.src.vitamin.service.ScreeningTestHistoryService;
 import ggs.brainvitamin.src.vitamin.service.VitaminAnalyticsService;
 import ggs.brainvitamin.utils.SecurityUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,7 @@ import static ggs.brainvitamin.src.user.patient.dto.ActivitiesDto.*;
 @RestController
 @RequestMapping("/patient")
 @RequiredArgsConstructor
+@Tag(name = "Patient", description = "Patient API")
 public class PatientUserController {
 
     private final PatientUserService patientUserService;
@@ -34,6 +37,7 @@ public class PatientUserController {
 
     @GetMapping("/activities")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
+    @Operation(summary = "환자 내 활동 보기 데이터 조회", description = "")
     public BaseResponse<ActivitiesResponseDto> getActivities() {
         try {
             String currentUserId = SecurityUtil.getCurrentUserId()
@@ -70,6 +74,7 @@ public class PatientUserController {
 
     @PutMapping("/profiles")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
+    @Operation(summary = "환자 프로필 정보 수정", description = "")
     public BaseResponse<String> setProfilesInfo(
             @Valid @RequestBody ProfilesRequestDto profilesRequestDto) {
 
@@ -90,6 +95,7 @@ public class PatientUserController {
 
     @PutMapping("/phone-number")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
+    @Operation(summary = "환자 전화번호 수정", description = "")
     public BaseResponse<String> setPhoneNumber(@Valid @RequestBody PatientUserDto.PhoneNumberDto phoneNumberDto) {
 
         try {
@@ -108,6 +114,7 @@ public class PatientUserController {
 
     @PutMapping("/font-size")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
+    @Operation(summary = "환자 글자크기 수정", description = "")
     public BaseResponse<String> setFontSize(@Valid @RequestBody FontSizeDto fontSizeDto) {
 
         try {

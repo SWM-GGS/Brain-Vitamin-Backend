@@ -14,6 +14,8 @@ import ggs.brainvitamin.src.user.patient.dto.TokenDto;
 import ggs.brainvitamin.src.user.patient.service.PatientFamilyService;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
 import ggs.brainvitamin.utils.SecurityUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
@@ -35,6 +37,7 @@ import static ggs.brainvitamin.src.user.patient.dto.TokenDto.*;
 @RestController
 @RequestMapping("/patient")
 @RequiredArgsConstructor
+@Tag(name = "Patient", description = "Patient API")
 public class PatientAuthController {
 
     private final PatientUserService patientUserService;
@@ -42,7 +45,9 @@ public class PatientAuthController {
     private final CommonCodeService commonCodeService;
     private final PatientFamilyService patientFamilyService;
 
+
     @PostMapping("/sms")
+    @Operation(summary = "환자 인증번호 문자 요청", description = "")
     public BaseResponse<SmsResponseDto> sendSms(@RequestBody MessageDto messageDto) throws
             JsonProcessingException,
             RestClientException,
@@ -60,6 +65,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/signup")
+    @Operation(summary = "환자 회원가입", description = "")
     public BaseResponse<LoginResponseDto> signUp(@Valid @RequestBody PatientUserDto.SignUpDto signUpDto) {
         try {
             // 함께 저장할 공통코드 정보 조회
@@ -80,6 +86,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "환자 로그인", description = "")
     public BaseResponse<LoginResponseDto> login(@RequestBody PhoneNumberDto phoneNumberDto) {
         try {
             // 로그인 후 사용자 정보 조회
@@ -96,6 +103,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "환자 로그아웃", description = "")
     public BaseResponse<String> logout(@Valid @RequestBody TokenDto tokenDto) {
 
         try {
@@ -108,6 +116,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/signout")
+    @Operation(summary = "환자 회원탈퇴", description = "")
     public BaseResponse<String> signOut(@Valid @RequestBody TokenDto tokenDto) {
 
         try {
@@ -133,6 +142,7 @@ public class PatientAuthController {
     }
 
     @PostMapping("/reissue-tokens")
+    @Operation(summary = "환자 토큰 재발급", description = "")
     public BaseResponse<LoginResponseDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
 
         try {
