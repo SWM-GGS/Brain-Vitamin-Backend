@@ -409,7 +409,7 @@ public class VitaminService {
             result.put("cogLevel", "의심");
         }
         else {
-            result.put("cogLevel", "정상");
+            result.put("cogLevel", "양호");
         }
 
         return result;
