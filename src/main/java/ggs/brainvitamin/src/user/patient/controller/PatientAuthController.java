@@ -149,9 +149,8 @@ public class PatientAuthController {
             AccessTokenDto accessToken = tokenDto.getAccessTokenDto();
             RefreshTokenDto refreshToken = tokenDto.getRefreshTokenDto();
 
-            // 두 토큰이 모두 존재하는지 확인
-            if (!StringUtils.hasText(accessToken.getAccessToken()))
-                return new BaseResponse<>(EMPTY_ACCESS_TOKEN);
+//            if (!StringUtils.hasText(accessToken.getAccessToken()))
+//                return new BaseResponse<>(EMPTY_ACCESS_TOKEN);
             if (!StringUtils.hasText(refreshToken.getRefreshToken()))
                 return new BaseResponse<>(EMPTY_REFRESH_TOKEN);
 
