@@ -257,6 +257,7 @@ public class VitaminService {
                     Map<String, Object> candidate = new HashMap<>();
 
                     candidate.put("imgUrl", poolMazeEntity.getImgUrl());
+                    candidate.put("answerImgUrl", poolMazeEntity.getAnswerImgUrl());
                     candidate.put("x", poolMazeDetailEntity.getX());
                     candidate.put("y", poolMazeDetailEntity.getY());
 

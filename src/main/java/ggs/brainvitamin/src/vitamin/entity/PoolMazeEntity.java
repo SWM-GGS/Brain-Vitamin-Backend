@@ -29,6 +29,9 @@ public class PoolMazeEntity extends BaseEntity {
     @Column(nullable = false)
     private Integer difficulty;
 
+    @Column(nullable = false)
+    private String answerImgUrl;
+
     @OneToMany(mappedBy = "poolMaze", cascade = CascadeType.ALL)
     private List<PoolMazeDetailEntity> poolMazeDetails = new ArrayList<>();
 
