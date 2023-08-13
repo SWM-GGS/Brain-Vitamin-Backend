@@ -149,8 +149,8 @@ public class PatientAuthController {
             AccessTokenDto accessToken = tokenDto.getAccessTokenDto();
             RefreshTokenDto refreshToken = tokenDto.getRefreshTokenDto();
 
-//            if (!StringUtils.hasText(accessToken.getAccessToken()))
-//                return new BaseResponse<>(EMPTY_ACCESS_TOKEN);
+            if (!StringUtils.hasText(accessToken.getAccessToken()))
+                return new BaseResponse<>(EMPTY_ACCESS_TOKEN);
             if (!StringUtils.hasText(refreshToken.getRefreshToken()))
                 return new BaseResponse<>(EMPTY_REFRESH_TOKEN);
 
