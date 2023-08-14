@@ -55,7 +55,6 @@ jobs:
       # with:
       #   arguments: build
 
-  deploy:
     # dokerfile을 통해 이미지를 빌드, 이를 dockerhub의 repo로 push
     # $ {{ secrets.DOCKER_REPO }}/brain-vitamin가 dockerhub에 생성한 repo
     - name: Docker build & push to dockerhub repo
