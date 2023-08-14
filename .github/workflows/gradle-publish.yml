@@ -11,8 +11,8 @@ name: Gradle Package
 on:
   push:
     branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+#  pull_request:
+#    branches: [ "develop" ]
 
 # 실제로 수행될 작업을 정의
 jobs:
