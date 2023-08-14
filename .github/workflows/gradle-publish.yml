@@ -60,7 +60,7 @@ jobs:
     - name: Docker build & push to dockerhub repo
       run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f Dockerfile -t $ {{ secrets.DOCKER_REPO }}/brain-vitamin .
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/brain-vitamin .
           docker push ${{ secrets.DOCKER_REPO }}/brain-vitamin
           
     # appleboy/ssh-action@master 액션을 사용하여 지정한 서버에 ssh로 접속, script 실행
