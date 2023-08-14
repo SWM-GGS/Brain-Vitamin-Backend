@@ -9,8 +9,8 @@ name: Gradle Package
 
 # main 브랜치에 push, pull request가 일어날 때마다 실행되도록 트리거 설정
 on:
-#  push:
-#    branches: [ "develop" ]
+  push:
+    branches: [ "develop" ]
   pull_request:
     branches: [ "develop" ]
 
