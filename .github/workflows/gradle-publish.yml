@@ -55,7 +55,7 @@ jobs:
       # with:
       #   arguments: build
 
-    - name: Docker build & push ㅎto dockerhub repo
+    - name: Docker build & push to dockerhub repo
       run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/brain-vitamin .
@@ -74,7 +74,8 @@ jobs:
         key: ${{ secrets.KEY }}
         envs: GITHUB_SHA
         script: |
-#          sudo docker rm -f $(docker ps -qa)
+          cd /home/ubuntu/Brain-Vitamin-Backend/
+          sudo docker rm -f $(docker ps -qa)
           sudo docker pull leetaegyu/brain-vitamin
           docker-compose up -d
           docker image prune -f
