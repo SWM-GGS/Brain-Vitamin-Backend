@@ -42,7 +42,7 @@ jobs:
       run: |
           cd ./src/main/resources
           touch ./application.yml
-          echo "${{ secrets.application }}" > ./application.yml
+          echo "${{ secrets.YML }}" > ./application.yml
       shell: bash
 
     # gradle을 통해 빌드
@@ -73,9 +73,9 @@ jobs:
         username: ubuntu
         key: ${{ secrets.KEY }}
         envs: GITHUB_SHA
-      script: |
-        sudo docker rm -f $(docker ps -qa)
-        sudo docker pull ${{ secrets.DOCKER_REPO }}/brain-vitamin
-        docker-compose up -d
-        docker image prune -f
+        script: |
+          sudo docker rm -f $(docker ps -qa)
+          sudo docker pull ${{ secrets.DOCKER_REPO }}/brain-vitamin
+          docker-compose up -d
+          docker image prune -f
         
