@@ -16,7 +16,7 @@ on:
 
 # 실제로 수행될 작업을 정의
 jobs:
-  gradle-build:
+  build:
 
     # ubuntu 최신 버전에서 script 실행
     runs-on: ubuntu-latest
@@ -55,18 +55,6 @@ jobs:
       # with:
       #   arguments: build
 
-  docker-build:
-
-    # ubuntu 최신 버전에서 script 실행
-    runs-on: ubuntu-latest
-    # 코드의 내용을 이 파일을 실행하여 action을 수행하는 주체(Github Actions에서 사용하는 VM)가 읽을 수 있도록 허용
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-    # dokerfile을 통해 이미지를 빌드, 이를 dockerhub의 repo로 push
-    # $ {{ secrets.DOCKER_REPO }}/brain-vitamin가 dockerhub에 생성한 repo
     - name: Docker build & push to dockerhub repo
       run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
@@ -74,16 +62,6 @@ jobs:
           docker tag ${{ secrets.DOCKER_REPO }}/brain-vitamin leetaegyu/brain-vitamin
           docker push leetaegyu/brain-vitamin
 
-  deploy:
-
-    # ubuntu 최신 버전에서 script 실행
-    runs-on: ubuntu-latest
-    # 코드의 내용을 이 파일을 실행하여 action을 수행하는 주체(Github Actions에서 사용하는 VM)가 읽을 수 있도록 허용
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
     # appleboy/ssh-action@master 액션을 사용하여 지정한 서버에 ssh로 접속, script 실행
     # script의 내용 -> 도커의 기존 프로세스 제거, docker repo로부터 최신에 push한 내용을 pull 받아 실행하는 것
     # 실행 시 docker-compose를 사용
@@ -100,3 +78,4 @@ jobs:
           sudo docker pull ${{ secrets.DOCKER_REPO }}leetaegyu/brain-vitamin
           docker-compose up -d
           docker image prune -f
+        
