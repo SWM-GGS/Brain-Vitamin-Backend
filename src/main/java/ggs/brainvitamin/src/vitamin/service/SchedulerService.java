@@ -19,7 +19,7 @@ public class SchedulerService {
     private final CommonCodeDetailRepository commonCodeDetailRepository;
 
     // 매일 정오 오전 12시에 실행
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void calculateVitaminConsecutiveDays() {
         CommonCodeDetailEntity commonCodeDetailEntity = commonCodeDetailRepository.findCommonCodeDetailEntityByCodeDetailName("환자");
 
@@ -31,6 +31,7 @@ public class SchedulerService {
                 userEntity.setConsecutiveDays(0);
             }
             userEntity.setTodayVitaminCheck(0);
+            userRepository.save(userEntity);
         }
 
     }
