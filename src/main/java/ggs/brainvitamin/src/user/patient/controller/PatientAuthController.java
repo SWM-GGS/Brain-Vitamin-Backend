@@ -87,7 +87,7 @@ public class PatientAuthController {
 
     @PostMapping("/login")
     @Operation(summary = "환자 로그인", description = "")
-    public BaseResponse<LoginResponseDto> login(@RequestBody PhoneNumberDto phoneNumberDto) {
+    public BaseResponse<LoginResponseDto> login(@Valid @RequestBody PhoneNumberDto phoneNumberDto) {
         try {
             // 로그인 후 사용자 정보 조회
             LoginResponseDto loginResponseDto = patientUserService.login(phoneNumberDto.getPhoneNumber());
