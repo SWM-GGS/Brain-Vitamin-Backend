@@ -22,5 +22,9 @@ public interface VitaminAnalyticsRepository extends JpaRepository<VitaminAnalyti
                                                                                                  LocalDateTime startDate,
                                                                                                  LocalDateTime endDate);
 
+    List<VitaminAnalyticsEntity> findByUserAndStatusAndCreatedAtBetweenOrderByCreatedAt(UserEntity user,
+                                                                                                 Status status,
+                                                                                                 LocalDateTime startDate,
+                                                                                                 LocalDateTime endDate);
 
 }
