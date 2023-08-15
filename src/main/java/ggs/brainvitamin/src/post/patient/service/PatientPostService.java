@@ -30,10 +30,8 @@ public class PatientPostService {
 
     private final PostRepository postRepository;
     private final FamilyMemberRepository familyMemberRepository;
-    private final CommonCodeRepository commonCodeRepository;
-    private final CommonCodeDetailRepository commonCodeDetailRepository;
 
-    public PostMainDto getFamilyStoriesMain(Long familyId) {
+    public List<PostPreviewDto> getFamilyStoriesAllPosts(Long familyId) {
 
         // familyId로 해당 가족 그룹의 게시글을 조회
         List<PostEntity> familyPostResults = postRepository.findByFamilyIdOrderByCreatedAtDesc(familyId);
@@ -49,28 +47,7 @@ public class PatientPostService {
             );
         }
 
-        // 모든 감정표현의 종류를 공통 코드 테이블을 통해 조회하여 리스트
-        CommonCodeEntity commonCodeEntity = commonCodeRepository.findByCode("EMOT")
-                        .orElseThrow(() -> new BaseException(CODE_NOT_EXISTS));
-
-        List<CommonCodeDetailEntity> commonCodeDetailEntityList =
-                commonCodeDetailRepository.findByCommonCode(commonCodeEntity);
-
-        List<EmotionInfoDto> emotionInfoDtoList = new ArrayList<>();
-        for (CommonCodeDetailEntity commonCodeDetailEntity : commonCodeDetailEntityList) {
-            emotionInfoDtoList.add(
-                    EmotionInfoDto.builder()
-                            .id(commonCodeDetailEntity.getId())
-                            .CodeDetailName(commonCodeDetailEntity.getCodeDetailName())
-                            .build()
-            );
-        }
-
-        // return 할 PostMainDto 빌드
-        return PostMainDto.builder()
-                .postPreviewDtoList(familyPostPreviewList)
-                .emotionInfoDtoList(emotionInfoDtoList)
-                .build();
+        return familyPostPreviewList;
     }
 
     public PostDetailDto getFamilyStoriesPost(Long postId) {
