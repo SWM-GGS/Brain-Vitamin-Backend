@@ -7,11 +7,13 @@ import ggs.brainvitamin.src.user.entity.FamilyEntity;
 import ggs.brainvitamin.src.user.entity.FamilyMemberEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.patient.dto.FamilyDto;
+import ggs.brainvitamin.src.user.patient.dto.FamilyMemberDto;
 import ggs.brainvitamin.src.user.repository.FamilyMemberRepository;
 import ggs.brainvitamin.src.user.repository.FamilyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -73,6 +75,26 @@ public class PatientFamilyService {
                 .familyExp(family.getFamilyExp())
                 .familyKey(family.getFamilyKey())
                 .build();
+    }
+
+    public List<FamilyMemberDto> getAllFamilyMembers(Long familyId) {
+
+        List<FamilyMemberEntity> familyMemberEntityList =
+                familyMemberRepository.findByFamilyIdAndStatus(familyId, Status.ACTIVE);
+
+        List<FamilyMemberDto> familyMemberDtoList = new ArrayList<>();
+        for (FamilyMemberEntity familyMemberEntity : familyMemberEntityList) {
+            familyMemberDtoList.add(
+                    FamilyMemberDto.builder()
+                            .name(familyMemberEntity.getUser().getName())
+                            .relationship(familyMemberEntity.getRelationship())
+                            .profileImg(familyMemberEntity.getUser().getProfileImgUrl())
+                            .build()
+            );
+        }
+
+        familyMemberDtoList.remove(0);
+        return familyMemberDtoList;
     }
 
     private String generateFamilyKey() {

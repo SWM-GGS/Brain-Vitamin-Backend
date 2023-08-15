@@ -2,15 +2,21 @@ package ggs.brainvitamin.src.post.patient.controller;
 
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
+import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
+import ggs.brainvitamin.src.common.service.CommonCodeService;
 import ggs.brainvitamin.src.post.patient.dto.*;
 import ggs.brainvitamin.src.post.patient.service.PatientEmotionService;
 import ggs.brainvitamin.src.post.patient.service.PatientPostService;
+import ggs.brainvitamin.src.user.patient.dto.FamilyMemberDto;
+import ggs.brainvitamin.src.user.patient.service.PatientFamilyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/patient/family-stories")
@@ -19,7 +25,9 @@ import org.springframework.web.bind.annotation.*;
 public class PatientPostController {
 
     private final PatientPostService patientPostService;
+    private final CommonCodeService commonCodeService;
     private final PatientEmotionService patientEmotionService;
+    private final PatientFamilyService patientFamilyService;
 
     /**
      * @param familyId
@@ -30,7 +38,21 @@ public class PatientPostController {
     @Operation(summary = "환자 우리가족 이야기 메인 화면 조회", description = "")
     public BaseResponse<PostMainDto> getFamilyStoriesMain(@PathVariable("familyId") Long familyId) {
         try {
-            return new BaseResponse<>(patientPostService.getFamilyStoriesMain(familyId));
+            // 현재 가족 그룹의 모든 게시글 조회
+            List<PostPreviewDto> familyStoriesPosts = patientPostService.getFamilyStoriesAllPosts(familyId);
+            // 감정표현 공통코드 정보 전체 조회
+            List<CommonCodeDetailDto> emotionInfos = commonCodeService.getCodeInfosWithCode("EMOT");
+            // 환자 가족 그룹 내 모든 멤버 정보 조회
+            List<FamilyMemberDto> familyMembers = patientFamilyService.getAllFamilyMembers(familyId);
+
+            PostMainDto postMainDto = PostMainDto.builder()
+                    .postPreviewDtoList(familyStoriesPosts)
+                    .emotionInfoDtoList(emotionInfos)
+                    .familyMemberDtoList(familyMembers)
+                    .build();
+
+            return new BaseResponse<>(postMainDto);
+
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
