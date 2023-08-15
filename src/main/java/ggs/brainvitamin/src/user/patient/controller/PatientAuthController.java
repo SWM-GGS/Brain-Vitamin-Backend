@@ -141,7 +141,7 @@ public class PatientAuthController {
         }
     }
 
-    @PostMapping("/reissue-tokens")
+    @PostMapping("/reissue")
     @Operation(summary = "환자 토큰 재발급", description = "")
     public BaseResponse<LoginResponseDto> reIssueTokens(@Valid @RequestBody TokenDto tokenDto) {
 
