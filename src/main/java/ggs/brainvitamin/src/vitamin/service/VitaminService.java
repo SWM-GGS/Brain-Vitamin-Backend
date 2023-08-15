@@ -1,5 +1,6 @@
 package ggs.brainvitamin.src.vitamin.service;
 
+import com.mysema.commons.lang.Pair;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.Result;
 import ggs.brainvitamin.config.Status;
@@ -312,15 +313,15 @@ public class VitaminService {
             userEntity.setTodayVitaminCheck(1);
         }
 
-        // 영역별 점수
-        Integer memoryScore = 0;
-        Integer attentionScore = 0;
-        Integer orientationScore = 0;
-        Integer visualScore = 0;
-        Integer languageScore = 0;
-        Integer calculationScore = 0;
-        Integer executiveScore = 0;
-        Integer soundScore = 0;
+        // 영역별 <점수, 하나라도 풀었는지 여부>
+        Pair<Integer, Boolean> memory = Pair.of(0, false);
+        Pair<Integer, Boolean> attention = Pair.of(0, false);
+        Pair<Integer, Boolean> orientation = Pair.of(0, false);
+        Pair<Integer, Boolean> visual = Pair.of(0, false);
+        Pair<Integer, Boolean> language = Pair.of(0, false);
+        Pair<Integer, Boolean> calculation = Pair.of(0, false);
+        Pair<Integer, Boolean> executive = Pair.of(0, false);
+        Pair<Integer, Boolean> sound = Pair.of(0, false);
 
         for (CogTrainingDto cogTrainingDto : postCogTrainingDto.getCogTrainingDtos()) {
             ProblemEntity problemEntity = problemRepository.findById(cogTrainingDto.getProblemId())
@@ -328,16 +329,16 @@ public class VitaminService {
 
             String cogArea = problemEntity.getProblemCategory().getAreaCode().getCodeDetailName();
 
-            if (cogTrainingDto.getResult().equals(Result.SUCCESS)) {
+            if (!cogTrainingDto.getResult().equals(Result.DONOT)) {
                 switch (cogArea) {
-                    case "기억력" -> memoryScore += cogTrainingDto.getScore();
-                    case "주의집중력" -> attentionScore += cogTrainingDto.getScore();
-                    case "시공간/지남력" -> orientationScore += cogTrainingDto.getScore();
-                    case "시지각능력" -> visualScore += cogTrainingDto.getScore();
-                    case "언어능력" -> languageScore += cogTrainingDto.getScore();
-                    case "계산능력" -> calculationScore += cogTrainingDto.getScore();
-                    case "집행능력" -> executiveScore += cogTrainingDto.getScore();
-                    default -> soundScore += cogTrainingDto.getScore();
+                    case "기억력" -> memory = Pair.of(memory.getFirst() + cogTrainingDto.getScore(), true);
+                    case "주의집중력" -> attention = Pair.of(attention.getFirst() + cogTrainingDto.getScore(), true);
+                    case "시공간/지남력" -> orientation = Pair.of(orientation.getFirst() + cogTrainingDto.getScore(), true);
+                    case "시지각능력" -> visual = Pair.of(visual.getFirst() + cogTrainingDto.getScore(), true);
+                    case "언어능력" -> language = Pair.of(language.getFirst() + cogTrainingDto.getScore(), true);
+                    case "계산능력" -> calculation = Pair.of(calculation.getFirst() + cogTrainingDto.getScore(), true);
+                    case "집행능력" -> executive = Pair.of(executive.getFirst() + cogTrainingDto.getScore(), true);
+                    default -> sound = Pair.of(sound.getFirst() + cogTrainingDto.getScore(), true);
                 }
             }
 
@@ -353,16 +354,49 @@ public class VitaminService {
             brainVitaminHistoryRepository.save(brainVitaminHistoryEntity);
         }
 
+        // 기억력 문제를 풀지 않은 경우
+        if (!memory.getSecond()) {
+            memory = Pair.of(-1, false);
+        }
+        // 기억력 문제를 풀지 않은 경우
+        if (!attention.getSecond()) {
+            attention = Pair.of(-1, false);
+        }
+        // 기억력 문제를 풀지 않은 경우
+        if (!orientation.getSecond()) {
+            orientation = Pair.of(-1, false);
+        }
+        // 기억력 문제를 풀지 않은 경우
+        if (!visual.getSecond()) {
+            visual = Pair.of(-1, false);
+        }
+        // 기억력 문제를 풀지 않은 경우
+        if (!language.getSecond()) {
+            language = Pair.of(-1, false);
+        }
+        // 기억력 문제를 풀지 않은 경우
+        if (!calculation.getSecond()) {
+            calculation = Pair.of(-1, false);
+        }
+        // 기억력 문제를 풀지 않은 경우
+        if (!executive.getSecond()) {
+            executive = Pair.of(-1, false);
+        }
+        // 기억력 문제를 풀지 않은 경우
+        if (!sound.getSecond()) {
+            sound = Pair.of(-1, false);
+        }
+
         VitaminAnalyticsEntity vitaminAnalyticsEntity = VitaminAnalyticsEntity.builder()
                 .user(userEntity)
-                .memoryScore(memoryScore)
-                .attentionScore(attentionScore)
-                .orientationScore(orientationScore)
-                .visualScore(visualScore)
-                .languageScore(languageScore)
-                .calculationScore(calculationScore)
-                .executiveScore(executiveScore)
-                .soundScore(soundScore)
+                .memoryScore(memory.getFirst())
+                .attentionScore(attention.getFirst())
+                .orientationScore(orientation.getFirst())
+                .visualScore(visual.getFirst())
+                .languageScore(language.getFirst())
+                .calculationScore(calculation.getFirst())
+                .executiveScore(executive.getFirst())
+                .soundScore(sound.getFirst())
                 .build();
 
         if (!postCogTrainingDto.getFinish()) {
@@ -371,10 +405,13 @@ public class VitaminService {
 
         vitaminAnalyticsRepository.save(vitaminAnalyticsEntity);
 
-        Integer totalScore = memoryScore + attentionScore + orientationScore + visualScore +
-                languageScore + calculationScore + executiveScore + soundScore;
+        Integer totalScore = memory.getFirst() + attention.getFirst() + orientation.getFirst() + visual.getFirst() +
+                language.getFirst() + calculation.getFirst() + executive.getFirst() + sound.getFirst();
 
         String result = "상위 " + (101 - (totalScore * 100 / 70)) + "%";
+        if (totalScore <= 0) {
+            result = "상위 99.99%";
+        }
         return result;
     }
 

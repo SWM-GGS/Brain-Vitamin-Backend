@@ -7,6 +7,8 @@ import ggs.brainvitamin.src.vitamin.repository.ScreeningTestHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import static ggs.brainvitamin.src.user.patient.dto.ActivitiesDto.*;
@@ -52,6 +54,7 @@ public class ScreeningTestHistoryService {
                 .totalScore(historyEntity.getTotalScore())
                 .state(state)
                 .description(description)
+                .testDate(historyEntity.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")))
                 .build();
 
         return historyDto;

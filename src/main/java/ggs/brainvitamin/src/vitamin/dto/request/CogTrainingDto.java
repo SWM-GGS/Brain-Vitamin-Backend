@@ -1,10 +1,7 @@
 package ggs.brainvitamin.src.vitamin.dto.request;
 
 import ggs.brainvitamin.config.Result;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +24,7 @@ public class CogTrainingDto {
     private Result result;
 
     @NotNull(message = "score 값을 입력해주세요")
-    @PositiveOrZero(message = "올바른 score 값을 입력해주세요")
+    @Min(value = -1, message = "올바른 score 값을 입력해주세요")
+    @Max(value = 10, message = "올바른 score 값을 입력해주세요")
     private Integer score;
 }
