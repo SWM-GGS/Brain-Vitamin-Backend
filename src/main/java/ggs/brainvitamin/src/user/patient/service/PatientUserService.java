@@ -46,6 +46,11 @@ public class PatientUserService {
                     throw new BaseException(USER_ALREADY_EXISTS);
                 });
 
+        userRepository.findByNickname(signUpDto.getNickname())
+                .ifPresent(none -> {
+                    throw new BaseException(DUPLICATED_NICKNAME);
+                });
+
         // 사용자 권한 정보 추가
         Set<AuthorityEntity> authorityEntity = new HashSet<>();
         authorityEntity.add(new AuthorityEntity("ROLE_USER"));
@@ -184,11 +189,16 @@ public class PatientUserService {
 
     public void updateProfilesInfo(Long userId,
                                    ProfilesRequestDto profilesRequestDto,
-                                   CommonCodeDetailDto codeDetailDto) {
+                                   CommonCodeDetailDto codeDetailDto) throws BaseException {
 
         // 기존 사용자 프로필 정보 조회
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
+        userRepository.findByNickname(profilesRequestDto.getNickname())
+                .ifPresent(none -> {
+                    throw new BaseException(DUPLICATED_NICKNAME);
+                });
 
         // 학력 코드 업데이트를 위한 공통 코드 엔티티 생성
         CommonCodeDetailEntity codeDetailEntity = CommonCodeDetailEntity.builder()

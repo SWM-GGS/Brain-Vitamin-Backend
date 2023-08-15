@@ -19,5 +19,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByIdAndStatus(Long userId, Status status);
     Optional<UserEntity> findByPhoneNumberAndStatus(String phoneNumber, Status status);
 
+    Optional<UserEntity> findByNickname(String phoneNumber);
+
     List<UserEntity> findAllByUserTypeCodeAndStatus(CommonCodeDetailEntity commonCodeDetailEntity, Status status);
 }
