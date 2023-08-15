@@ -1,8 +1,10 @@
 package ggs.brainvitamin.src.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,5 +23,8 @@ public class CommonCodeEntity {
     private String codeName;
 
     @OneToMany(mappedBy = "commonCode", cascade = CascadeType.ALL)
-    private List<CommonCodeDetailEntity> commonCodeDetailEntities;
+    @JsonBackReference
+    private List<CommonCodeDetailEntity> commonCodeDetailEntities = new ArrayList<>();
+
+
 }
