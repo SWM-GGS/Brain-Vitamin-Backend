@@ -46,6 +46,8 @@ public class PatientUserController {
 
             LocalDateTime today = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
+            System.out.println("today = " + today);
+
             // 이번주 간 비타민 참여 여부 조회
             GetWeeklyVitaminDto weeklyVitaminDto =
                     vitaminAnalyticsService.getWeeklyVitaminAttendance(userId, today);
