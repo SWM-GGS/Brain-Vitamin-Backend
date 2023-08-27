@@ -41,14 +41,16 @@ public class PatientUserService {
 
     public Long createPatientUser(SignUpDto signUpDto, CommonCodeDetailDto codeDetailDto) throws BaseException {
 
+        // 전화번호 중복 체크
         userRepository.findByPhoneNumberAndStatus(signUpDto.getPhoneNumber(), Status.ACTIVE)
                 .ifPresent(none -> {
                     throw new BaseException(USER_ALREADY_EXISTS);
                 });
-
-        userRepository.findByNickname(signUpDto.getNickname())
+      
+        // 닉네임 중복 체크
+        userRepository.findByNicknameAndStatus(signUpDto.getNickname(), Status.ACTIVE)
                 .ifPresent(none -> {
-                    throw new BaseException(DUPLICATED_NICKNAME);
+                    throw new BaseException(NICKNAME_ALREADY_EXISTS);
                 });
 
         // 사용자 권한 정보 추가
@@ -195,9 +197,13 @@ public class PatientUserService {
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
 
-        userRepository.findByNickname(profilesRequestDto.getNickname())
-                .ifPresent(none -> {
-                    throw new BaseException(DUPLICATED_NICKNAME);
+
+        // 닉네임 중복 체크 (조회된 유저가 자기 자신인 경우 제외)
+        userRepository.findByNicknameAndStatus(profilesRequestDto.getNickname(), Status.ACTIVE)
+                .ifPresent(userEntity1 -> {
+                    if (!userEntity1.getId().equals(userId)) {
+                        throw new BaseException(NICKNAME_ALREADY_EXISTS);
+                    }
                 });
 
         // 학력 코드 업데이트를 위한 공통 코드 엔티티 생성
@@ -214,6 +220,7 @@ public class PatientUserService {
                 profilesRequestDto.getProfileImgUrl(),
                 codeDetailEntity
         );
+
         userRepository.save(userEntity);
     }
 
@@ -221,6 +228,14 @@ public class PatientUserService {
 
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
+        // 전화번호 중복 체크 (조회된 유저가 자기 자신일 때는 제외)
+        userRepository.findByPhoneNumberAndStatus(phoneNumber, Status.ACTIVE)
+                .ifPresent(userEntity1 -> {
+                    if (!userEntity1.getId().equals(userId)) {
+                        throw new BaseException(USER_ALREADY_EXISTS);
+                    }
+                });
 
         userEntity.setPhoneNumber(phoneNumber);
         userRepository.save(userEntity);

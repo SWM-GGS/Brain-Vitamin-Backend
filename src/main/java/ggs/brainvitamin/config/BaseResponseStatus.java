@@ -24,8 +24,8 @@ public enum BaseResponseStatus {
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
     USER_ALREADY_EXISTS(false, 2011, "이미 가입된 전화번호입니다."),
-    PHONENUMBER_NOT_EXISTS(false, 2012, "가입되지 않은 전화번호입니다."),
-    DUPLICATED_NICKNAME(false, 2013, "중복되는 닉네임입니다."),
+    PHONE_NUMBER_NOT_EXISTS(false, 2012, "가입되지 않은 전화번호입니다."),
+    NICKNAME_ALREADY_EXISTS(false, 2013, "이미 존재하는 닉네임입니다."),
     INVALID_LOGIN_INFO(false, 2015, "유효하지 않은 로그인입니다"),
 
 
