@@ -48,7 +48,7 @@ public class PatientAuthController {
 
     @PostMapping("/sms")
     @Operation(summary = "환자 인증번호 문자 요청", description = "")
-    public BaseResponse<SmsResponseDto> sendSms(@RequestBody MessageDto messageDto) throws
+    public BaseResponse<SmsResponseDto> sendSms(@Valid @RequestBody MessageDto messageDto) throws
             JsonProcessingException,
             RestClientException,
             URISyntaxException,

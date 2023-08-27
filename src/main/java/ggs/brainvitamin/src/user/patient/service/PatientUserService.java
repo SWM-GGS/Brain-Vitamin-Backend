@@ -46,7 +46,7 @@ public class PatientUserService {
                 .ifPresent(none -> {
                     throw new BaseException(USER_ALREADY_EXISTS);
                 });
-
+      
         // 닉네임 중복 체크
         userRepository.findByNicknameAndStatus(signUpDto.getNickname(), Status.ACTIVE)
                 .ifPresent(none -> {
@@ -191,11 +191,12 @@ public class PatientUserService {
 
     public void updateProfilesInfo(Long userId,
                                    ProfilesRequestDto profilesRequestDto,
-                                   CommonCodeDetailDto codeDetailDto) {
+                                   CommonCodeDetailDto codeDetailDto) throws BaseException {
 
         // 기존 사용자 프로필 정보 조회
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+
 
         // 닉네임 중복 체크 (조회된 유저가 자기 자신인 경우 제외)
         userRepository.findByNicknameAndStatus(profilesRequestDto.getNickname(), Status.ACTIVE)
