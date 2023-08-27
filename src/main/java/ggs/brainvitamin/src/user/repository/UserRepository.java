@@ -15,9 +15,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @EntityGraph(attributePaths = "authorities")
     Optional<UserEntity> findOneWithAuthoritiesByPhoneNumberAndStatus(String phoneNumber, Status status);
-
     Optional<UserEntity> findByIdAndStatus(Long userId, Status status);
     Optional<UserEntity> findByPhoneNumberAndStatus(String phoneNumber, Status status);
-
+    Optional<UserEntity> findByNicknameAndStatus(String nickname, Status status);
     List<UserEntity> findAllByUserTypeCodeAndStatus(CommonCodeDetailEntity commonCodeDetailEntity, Status status);
 }
