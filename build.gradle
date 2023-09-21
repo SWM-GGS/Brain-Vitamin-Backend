@@ -70,6 +70,15 @@ dependencies {
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	// Httpclient
+	compileOnly 'org.apache.httpcomponents:httpclient:4.5.14'
+
+
+	// Httpmime
+	compileOnly 'org.apache.httpcomponents:httpmime:4.5.14'
+
+	// Gson
+	implementation 'com.google.code.gson:gson:2.8.9'
 
 }
 
