@@ -83,6 +83,9 @@ dependencies {
 	// Jackson
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
 
+	// chatGPT
+	implementation 'io.github.flashvayne:chatgpt-spring-boot-starter:1.0.4'
+
 }
 
 tasks.named('test') {
