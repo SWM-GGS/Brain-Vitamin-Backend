@@ -122,7 +122,6 @@ public class VitaminController {
     public BaseResponse<Map<String, Object>> submitScreeningTest(@Valid @RequestBody PostScreeningTestDto postScreeningTestDto) {
         try {
             Long userId = getUserId();
-
             Map<String, Object> responseMap = vitaminService.submitScreeningTest(userId, postScreeningTestDto);
 
             return new BaseResponse<>(responseMap);
