@@ -105,7 +105,6 @@ public class VitaminController {
     public BaseResponse<List<Map<String, Object>>> getScreeningTest() {
         try {
             Long userId = getUserId();
-
             List<Map<String, Object>> responseMap = vitaminService.getScreeningTest(userId);
 
             return new BaseResponse<>(responseMap);
