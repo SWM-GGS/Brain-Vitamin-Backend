@@ -1,29 +1,18 @@
 package ggs.brainvitamin.src.vitamin.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.src.vitamin.dto.request.SpeechDto;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,10 +28,7 @@ public class ClovaSpeechService {
     @Value("${clova-speech.secretKey}")
     private String secretKey;
 
-    private CloseableHttpClient httpClient = HttpClients.createDefault();
-    private Gson gson = new Gson();
-
-    public Map<String, Object> getSpeechToText(Long userId, String fileUrl) throws BaseException {
+    public Map getSpeechToText(Long userId, String fileUrl) throws BaseException {
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
@@ -50,65 +36,30 @@ public class ClovaSpeechService {
             throw new BaseException(INVALID_USERTYPE);
         }
 
-        try {
-            SpeechDto.NestRequestEntity nestRequest = new SpeechDto.NestRequestEntity();
+        SpeechDto.NestRequestEntity nestRequest = new SpeechDto.NestRequestEntity();
 
-            String result = url(fileUrl, nestRequest);
+        // 헤더 추가
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json");
+        headers.set("X-CLOVASPEECH-API-KEY", secretKey);
 
-            ObjectMapper mapper = new ObjectMapper();
-            TypeReference<Map<String, Object>> typeReference = new TypeReference<>() {};
+        // requestBody 설정
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("url", fileUrl);
+        requestBody.put("language", nestRequest.getLanguage());
+        requestBody.put("completion", nestRequest.getCompletion());
+        requestBody.put("wordAlignment", nestRequest.getWordAlignment());
+        requestBody.put("fullText", nestRequest.getFullText());
 
-            return mapper.readValue(result, typeReference);
-        } catch (Exception e) {
-            throw new BaseException(INVALID_CLOVA_SPEECH);
-        }
+        // 헤더와 바디 묶어서 엔티티로 만들기
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
+        // RestTemplate으로 post 요청 보내기
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Map> response = restTemplate.postForEntity(invokeUrl + "/recognizer/url", requestEntity, Map.class);
+
+        return response.getBody();
     }
-
-    /**
-     * recognize media using URL
-     * @param url required, the media URL
-     * @param nestRequest optional
-     * @return string
-     */
-    public String url(String url, SpeechDto.NestRequestEntity nestRequest) {
-         Header[] HEADERS = new Header[] {
-                new BasicHeader("Accept", "application/json"),
-                new BasicHeader("X-CLOVASPEECH-API-KEY", secretKey),
-        };
-
-        HttpPost httpPost = new HttpPost(invokeUrl + "/recognizer/url");
-        httpPost.setHeaders(HEADERS);
-        Map<String, Object> body = new HashMap<>();
-        body.put("url", url);
-        body.put("language", nestRequest.getLanguage());
-        body.put("completion", nestRequest.getCompletion());
-        body.put("wordAlignment", nestRequest.getWordAlignment());
-        body.put("fullText", nestRequest.getFullText());
-//        body.put("callback", nestRequest.getCallback());
-//        body.put("userdata", nestRequest.getCallback());
-//        body.put("forbiddens", nestRequest.getForbiddens());
-//        body.put("boostings", nestRequest.getBoostings());
-//        body.put("diarization", nestRequest.getDiarization());
-        HttpEntity httpEntity = new StringEntity(gson.toJson(body), ContentType.APPLICATION_JSON);
-        httpPost.setEntity(httpEntity);
-        return execute(httpPost);
-    }
-
-    private String execute(HttpPost httpPost) {
-        try (final CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
-            final HttpEntity entity = httpResponse.getEntity();
-            return EntityUtils.toString(entity, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-
-
-
-
 
 
 }
