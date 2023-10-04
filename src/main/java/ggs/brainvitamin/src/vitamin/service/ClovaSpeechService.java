@@ -22,7 +22,7 @@ public class ClovaSpeechService {
     @Value("${clova-speech.secretKey}")
     private String secretKey;
 
-    public Map getSpeechToText(Long userId, String fileUrl) throws BaseException {
+    public Map getSpeechToText(String fileUrl) throws BaseException {
         SpeechDto.NestRequestEntity nestRequest = new SpeechDto.NestRequestEntity();
 
         // 헤더 추가
