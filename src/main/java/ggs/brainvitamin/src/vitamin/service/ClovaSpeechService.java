@@ -1,9 +1,6 @@
 package ggs.brainvitamin.src.vitamin.service;
 
 import ggs.brainvitamin.config.BaseException;
-import ggs.brainvitamin.config.Status;
-import ggs.brainvitamin.src.user.entity.UserEntity;
-import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.src.vitamin.dto.request.SpeechDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,12 +13,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ggs.brainvitamin.config.BaseResponseStatus.*;
-
 @Service
 @RequiredArgsConstructor
 public class ClovaSpeechService {
-    private final UserRepository userRepository;
 
     @Value("${clova-speech.invokeUrl}")
     private String invokeUrl;
@@ -29,13 +23,6 @@ public class ClovaSpeechService {
     private String secretKey;
 
     public Map getSpeechToText(Long userId, String fileUrl) throws BaseException {
-        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
-
-        if (!userEntity.getUserTypeCode().getCodeDetailName().equals("환자")) {
-            throw new BaseException(INVALID_USERTYPE);
-        }
-
         SpeechDto.NestRequestEntity nestRequest = new SpeechDto.NestRequestEntity();
 
         // 헤더 추가
