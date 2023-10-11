@@ -42,7 +42,7 @@ jobs:
     # Github Secrets로부터 데이터를 받아서, 워크 플로우에 파일 생성
     - name: Make application.yml
       run: |
-          mkdir ./src/main/resources
+#          mkdir ./src/main/resources
           cd ./src/main/resources
           touch ./application-prod.yml
           echo "${{ secrets.PROD-YML }}" > ./application-prod.yml
