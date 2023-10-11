@@ -1,8 +1,5 @@
 package ggs.brainvitamin.src.vitamin.service;
 
-import ggs.brainvitamin.config.BaseException;
-import ggs.brainvitamin.config.Status;
-import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +13,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ggs.brainvitamin.config.BaseResponseStatus.INVALID_USERTYPE;
-import static ggs.brainvitamin.config.BaseResponseStatus.NOT_ACTIVATED_USER;
-
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -28,15 +22,7 @@ public class ChatService {
     private String API_KEY;
     private static final String ENDPOINT = "https://api.openai.com/v1/completions";
 
-    public Map getChatResponse(Long userId, String prompt, float temperature, int maxTokens) {
-        // 유저 체크
-        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
-                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
-
-        // 환자 타입의 유저가 아닌 경우, 예외 처리
-        if (!userEntity.getUserTypeCode().getCodeDetailName().equals("환자")) {
-            throw new BaseException(INVALID_USERTYPE);
-        }
+    public Map getChatResponse(String prompt, float temperature, int maxTokens) {
 
         // 헤더 추가
         HttpHeaders headers = new HttpHeaders();

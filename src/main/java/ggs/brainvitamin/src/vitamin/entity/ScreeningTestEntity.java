@@ -36,6 +36,9 @@ public class ScreeningTestEntity extends BaseEntity {
     @Column()
     private String imgUrl;
 
+    @Column()
+    private String audioUrl;
+
     @Column(nullable = false)
     private String answer;
 
