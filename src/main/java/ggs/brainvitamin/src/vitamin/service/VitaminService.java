@@ -1,5 +1,6 @@
 package ggs.brainvitamin.src.vitamin.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysema.commons.lang.Pair;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.Result;
@@ -8,10 +9,7 @@ import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.common.repository.CommonCodeDetailRepository;
 import ggs.brainvitamin.src.user.entity.UserEntity;
 import ggs.brainvitamin.src.user.repository.UserRepository;
-import ggs.brainvitamin.src.vitamin.dto.request.CogTrainingDto;
-import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
-import ggs.brainvitamin.src.vitamin.dto.request.PostScreeningTestDto;
-import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
+import ggs.brainvitamin.src.vitamin.dto.request.*;
 import ggs.brainvitamin.src.vitamin.dto.response.CogTrainingPoolDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetCogTrainingDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
@@ -46,6 +44,9 @@ public class VitaminService {
     private final PoolCardRepository poolCardRepository;
     private final PoolMazeRepository poolMazeRepository;
     private final PoolMazeDetailRepository poolMazeDetailRepository;
+
+    private final ClovaSpeechService clovaSpeechService;
+    private final ChatService chatService;
 
 
 
@@ -419,14 +420,25 @@ public class VitaminService {
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
-        List<ScreeningTestEntity> screeningTestEntities = screeningTestRepository.findAll();
+        List<ScreeningTestEntity> screeningTestEntities = screeningTestRepository.findAllByStatus(Status.INACTIVE);
 
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (ScreeningTestEntity screeningTestEntity : screeningTestEntities) {
             Map<String, Object> candidate = new HashMap<>();
 
+            candidate.put("screeningTestId", screeningTestEntity.getId());
+            candidate.put("audioUrl", screeningTestEntity.getAudioUrl());
             candidate.put("description", screeningTestEntity.getDescription());
+
+             if (screeningTestEntity.getImgUrl() != null) {
+             candidate.put("imgUrl", screeningTestEntity.getImgUrl());
+             }
+
+             if (screeningTestEntity.getId() == 57) {
+                 candidate.put("timeLimit", screeningTestEntity.getTimeLimit());
+             }
+
             result.add(candidate);
         }
 
@@ -451,5 +463,444 @@ public class VitaminService {
         }
 
         return result;
+    }
+
+    public Map<String, Object> checkScreeningTestDetail(Long userId, PostScreeningTestDetailDto postScreeningTestDetailDto) {
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        // 환자 타입의 유저가 아닌 경우, 예외 처리
+        if (!userEntity.getUserTypeCode().getCodeDetailName().equals("환자")) {
+            throw new BaseException(INVALID_USERTYPE);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        int correct = 0;
+
+        // 오디오 파일이 없는 문제 -> 모눈종이 그림 따라 그리기 문제
+        if (postScreeningTestDetailDto.getScreeningTestId() == 42) {
+            correct = checkTest9(postScreeningTestDetailDto.getFirstVertex(), postScreeningTestDetailDto.getSecondVertex());
+        }
+        // 오디오 파일이 있는 문제
+        else {
+            Map speechToText = clovaSpeechService.getSpeechToText(postScreeningTestDetailDto.getAudioFileUrl());
+
+            // STT 변환에 성공한 경우
+            if (speechToText.get("message").equals("Succeeded")) {
+                String text = String.valueOf(speechToText.get("text"));
+
+                correct = switch (postScreeningTestDetailDto.getScreeningTestId().intValue()) {
+                    // 올해는 몇 년도입니까?
+                    case 31 -> checkTest1(text);
+
+                    // 지금은 몇 월입니까?
+                    case 32 -> checkTest2(text);
+
+                    // 오늘은 며칠입니까?
+                    case 33 -> checkTest3(text);
+
+                    // 오늘은 무슨 요일입니까?
+                    case 34 -> checkTest4(text);
+
+                    // 현재 검사자께서 살고계시는 나라는 어디입니까?
+                    case 35 -> checkTest5(text);
+
+                    // 제가 불러드리는 숫자를 그대로 따라 해 주세요
+                    // 1번
+                    case 38 -> checkTest6(text);
+
+                    // 제가 불러드리는 숫자를 그대로 따라 해 주세요.
+                    // 2번
+                    case 39 -> checkTest7(text);
+
+                    // 제가 불러드리는 말을 끝에서부터 거꾸로 따라 해 주세요
+                    case 41 -> checkTest8(text);
+
+                    // 제가 불러드리는 말을 끝에서부터 거꾸로 따라 해 주세요
+                    case 51 -> {
+                        Map<String, Object> checkMap = checkTest10(text);
+
+                        List<?> forgetIndex = convertObjectToList(checkMap.get("forgetIndex"));
+                        result.put("forgetIndex", forgetIndex);
+
+                        yield (int) checkMap.get("totalScore");
+                    }
+
+                    // 이것을 무엇입니까? (칫솔)
+                    case 53 -> checkTest11(text);
+
+                    // 이것을 무엇입니까? (그네)
+                    case 54 -> checkTest12(text);
+
+                    // 이것을 무엇입니까? (주사위)
+                    case 55 -> checkTest13(text);
+
+                    // 박수를 두번 치고, 조금 쉬었다가 한번 더 쳐주세요
+                    case 56 -> checkTest14(text);
+
+                    // 지금부터 1분 동안 과일이나 채소를 최대한 많이 이야기 해 주세요. 준비되셨지요? 자, 과일이나 채소 이름을 말씀해 주세요
+                    case 57 -> checkTest15(text);
+                    default -> 0;
+                };
+            }
+        }
+
+        // 문제 풀이에 성공한 경우
+        if (correct > 0) {
+            result.put("isCorrect", true);
+            result.put("score", correct);
+            result.put("description", "문제 풀이에 성공하였습니다.");
+            result.put("stop", true);
+        }
+        // 문제 풀이에 실패한 경우
+        else {
+            result.put("isCorrect", false);
+            result.put("score", 0);
+            result.put("description", "문제 풀이에 실패하였습니다.");
+
+            if (postScreeningTestDetailDto.getCount() == 2) {
+                result.put("stop", true);
+            }
+            else {
+                result.put("stop", false);
+            }
+        }
+
+
+        return result;
+
+    }
+
+    // Object 객체를 List로 변환
+    public List<?> convertObjectToList(Object obj) {
+        List<?> list = new ArrayList<>();
+        if (obj.getClass().isArray()) {
+            list = Arrays.asList((Object[])obj);
+        } else if (obj instanceof Collection) {
+            list = new ArrayList<>((Collection<?>)obj);
+        }
+        return list;
+    }
+
+    // GPT 응답 추출 메서드
+    public String getGptResponseText(Map response) {
+        Object choices = response.get("choices");
+        List<?> objects = convertObjectToList(choices);
+        Object textObject = objects.get(0);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // convert object to map
+        Map<String, Object> map = objectMapper.convertValue(textObject, Map.class);
+
+        return String.valueOf(map.get("text"));
+    }
+
+    public int checkTest1(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        // 현재 날짜
+        LocalDate nowDate = LocalDate.now();
+
+        // 포맷 정의
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+
+        // 포맷 적용
+        String currentYear = nowDate.format(formatter);
+
+        System.out.println("현재 연도 : " + currentYear);
+        System.out.println("오디오 답변 : " + afterStr);
+
+        // 답변에 현재 연도을 포함하면 정답
+        if (afterStr.contains(currentYear)) {
+            System.out.println("문제 풀이 성공");
+            return 1;
+        }
+        return 0;
+    }
+
+    private int checkTest2(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        // 현재 날짜
+        LocalDate nowDate = LocalDate.now();
+
+        // 포맷 정의
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM");
+
+        // 포맷 적용
+        String currentMonth = nowDate.format(formatter);
+
+        System.out.println("현재 월 : " + currentMonth);
+        System.out.println("오디오 답변 : " + afterStr);
+
+        // 답변에 현재 월을 포함하면 정답
+        if (afterStr.contains(currentMonth)) {
+            System.out.println("문제 풀이 성공");
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest3(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        // 현재 날짜
+        LocalDate nowDate = LocalDate.now();
+
+        // 포맷 적용
+        String currentDay = String.valueOf(nowDate.getDayOfMonth());
+
+        System.out.println("현재 날짜 : " + currentDay);
+        System.out.println("오디오 답변 : " + afterStr);
+
+        // 답변에 현재 날짜을 포함하면 정답
+        if (afterStr.contains(currentDay)) {
+            System.out.println("문제 풀이 성공");
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest4(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        // 현재 날짜
+        LocalDate nowDate = LocalDate.now();
+
+        int weekValue = nowDate.getDayOfWeek().getValue();
+
+        List<String> weekList = new ArrayList<>(Arrays.asList("월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"));
+
+        String currentWeek = weekList.get(weekValue);
+
+        System.out.println("현재 일자 : " + currentWeek);
+        System.out.println("오디오 답변 : " + afterStr);
+
+        // 답변에 특정 요일을 포함하면 정답
+        if (afterStr.contains(currentWeek)) {
+            System.out.println("문제 풀이 성공");
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest5(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        // 답변에 대한민국 또는 한국을 포함하면 정답
+        if (afterStr.contains("대한민국") | afterStr.contains("한국")) {
+            System.out.println("문제 풀이 성공");
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest6(String text) {
+        // 답변에 6973을 포함하면 정답
+        if (text.contains("6 9 7 3")) {
+            System.out.println("문제 풀이 성공");
+            return 1;
+        }
+
+        return 0;
+    }
+    private int checkTest7(String text) {
+        // 답변에 57284를 포함하면 정답
+        if (text.contains("5 7 2 8 4")) {
+            System.out.println("문제 풀이 성공");
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest8(String text) {
+        String editedText = text.replaceAll(" ", "");
+
+        // 답변에 산강수금 포함하면 정답
+        if (editedText.contains("산강수금")) {
+            System.out.println("문제 풀이 성공");
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest9(List<Integer> firstVertex, List<Integer> secondVertex) {
+        List<Integer> answerFirst = new ArrayList<>(Arrays.asList(2, 2, 6, 8, 8, 9, 12, 12, 14, 14, 17, 18));
+        List<Integer> answerSecond = new ArrayList<>(Arrays.asList(6, 8, 12, 13, 9, 14, 17, 13, 18, 19, 18, 19));
+
+        // 맞춘 선분의 개수
+        int correctCount = 0;
+
+        // 틀린 선분의 개수
+        int inCorrectCount = 0;
+
+        // 그린 그림의 선분을 통해 맞춘 선분의 개수 계산
+        for (int i = 0; i < firstVertex.size(); i++) {
+            // 현재의 선분이 정답인지 판별할 변수
+            boolean correct = false;
+
+            for (int j = 0; j < answerFirst.size(); j++) {
+                // 정답인 선분인 경우
+                if ((firstVertex.get(i).equals(answerFirst.get(j)) & secondVertex.get(i).equals(answerSecond.get(j))) |
+                        (firstVertex.get(i).equals(answerSecond.get(j)) & secondVertex.get(i).equals(answerFirst.get(j)))) {
+                    correct = true;
+                    answerFirst.set(j, 0);
+                    answerSecond.set(j, 0);
+                    break;
+                }
+            }
+            // 현재의 선분이 정답인 경우
+            if (correct) {
+                correctCount++;
+            }
+            // 현재의 선분이 오답인 경우
+            else {
+                inCorrectCount++;
+            }
+        }
+
+        // 오답이 2개 이상인 경우 문제 틀림
+        if (inCorrectCount >= 2) {
+            return 0;
+        }
+        // 오답이 1개인 경우
+        else if (inCorrectCount == 1) {
+            // 정답 수가 12개이면 오류 1개로 1점
+            if (correctCount == 12) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+        // 오답이 0개인 경우
+        else {
+            // 모든 선분을 다 맞춘 경우 2점
+            if (correctCount == 12) {
+                return 2;
+            }
+            // 선분 하나를 생략한 경우 1점
+            else if (correctCount == 11) {
+                return 1;
+            }
+            // 선분 두개 이상 생략한 경우 0점
+            else {
+                return 0;
+            }
+        }
+    }
+    // 민수는 / 자전거를 타고 / 공원에 가서 / 11시부터 / 야구를 했다
+    private Map<String, Object> checkTest10(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        Map<String, Object> result = new HashMap<>();
+
+        List<Integer> forgetIndex = new ArrayList<>();
+
+        int totalScore = 0;
+
+        if (afterStr.contains("민수")) {
+            totalScore = totalScore + 2;
+        }
+        else {
+            forgetIndex.add(1);
+        }
+
+        if (afterStr.contains("자전거")) {
+            totalScore = totalScore + 2;
+        }
+        else {
+            forgetIndex.add(2);
+        }
+
+        if (afterStr.contains("공원")) {
+            totalScore = totalScore + 2;
+        }
+        else {
+            forgetIndex.add(3);
+        }
+
+        if (afterStr.contains("11시")) {
+            totalScore = totalScore + 2;
+        }
+        else {
+            forgetIndex.add(4);
+        }
+
+        if (afterStr.contains("야구")) {
+            totalScore = totalScore + 2;
+        }
+        else {
+            forgetIndex.add(5);
+        }
+
+        result.put("totalScore", totalScore);
+        result.put("forgetIndex", forgetIndex);
+
+        return result;
+    }
+    private int checkTest11(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        if (afterStr.contains("칫솔")) {
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest12(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        if (afterStr.contains("그네")) {
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest13(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"를 맞춤법이나 어색한 표현이 없게 수정하고 결과값만 알려줘.";
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        if (afterStr.contains("주사위")) {
+            return 1;
+        }
+        return 0;
+    }
+    private int checkTest14(String text) {
+
+        return 0;
+    }
+    private int checkTest15(String text) {
+
+        return 0;
     }
 }

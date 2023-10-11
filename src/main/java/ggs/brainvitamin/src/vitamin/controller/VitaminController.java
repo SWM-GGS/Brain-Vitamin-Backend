@@ -3,14 +3,13 @@ package ggs.brainvitamin.src.vitamin.controller;
 import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.vitamin.dto.request.PostCogTrainingDto;
+import ggs.brainvitamin.src.vitamin.dto.request.PostScreeningTestDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostScreeningTestDto;
 import ggs.brainvitamin.src.vitamin.dto.request.PostUserDetailDto;
 import ggs.brainvitamin.src.vitamin.dto.response.GetPatientHomeDto;
 import ggs.brainvitamin.src.vitamin.service.VitaminService;
 import ggs.brainvitamin.utils.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -105,8 +104,25 @@ public class VitaminController {
     public BaseResponse<List<Map<String, Object>>> getScreeningTest() {
         try {
             Long userId = getUserId();
-
             List<Map<String, Object>> responseMap = vitaminService.getScreeningTest(userId);
+
+            return new BaseResponse<>(responseMap);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 인지 선별검사 문제별 답안 제출
+     */
+    @Operation(summary = "인지 선별검사 문제별 답안 제출", description = "")
+    @PostMapping("/vitamins/screening-test/detail")
+    public BaseResponse<Map<String, Object>> submitScreeningTest(@Valid @RequestBody PostScreeningTestDetailDto postScreeningTestDetailDto) {
+        try {
+            Long userId = getUserId();
+            Map<String, Object> responseMap = vitaminService.checkScreeningTestDetail(
+                    userId,
+                    postScreeningTestDetailDto);
 
             return new BaseResponse<>(responseMap);
         } catch (BaseException e) {
@@ -122,7 +138,6 @@ public class VitaminController {
     public BaseResponse<Map<String, Object>> submitScreeningTest(@Valid @RequestBody PostScreeningTestDto postScreeningTestDto) {
         try {
             Long userId = getUserId();
-
             Map<String, Object> responseMap = vitaminService.submitScreeningTest(userId, postScreeningTestDto);
 
             return new BaseResponse<>(responseMap);

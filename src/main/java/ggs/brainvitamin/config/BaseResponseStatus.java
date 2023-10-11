@@ -65,6 +65,7 @@ public enum BaseResponseStatus {
 
     // 선별 검사 관련 오류
     HISTORY_NOT_EXISTS(false, 2110, "선별검사 결과가 존재하지 않습니다."),
+    INVALID_CLOVA_SPEECH(false, 2115, "음성 인식에 실패하였습니다."),
 
     // 신고 관련 요청 오류
     INVALID_REPORT_TYPE(false,2190,"잘못된 신고 형식입니다."),
