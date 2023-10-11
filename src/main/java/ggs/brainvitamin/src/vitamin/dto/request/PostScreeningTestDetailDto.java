@@ -29,7 +29,7 @@ public class PostScreeningTestDetailDto {
     @Pattern(regexp = "((http[s]?|ftp):\\/\\/)?(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=가-힣]{1,256}[:|\\.][a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+,.~#?&\\/=가-힣]*)", message = "잘못된 URL 링크입니다.")
     private String audioFileUrl;
 
-    private List<Integer> row;
+    private List<Integer> firstVertex;
 
-    private List<Integer> column;
+    private List<Integer> secondVertex;
 }
