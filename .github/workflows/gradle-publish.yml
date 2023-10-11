@@ -60,26 +60,26 @@ jobs:
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker build -f Dockerfile-prod -t ${{ secrets.DOCKER_REPO }}/brain-vitamin:prod .
-        docker tag ${{ secrets.DOCKER_REPO }}/brain-vitamin leetaegyu/brain-vitamin:prod
+        docker tag ${{ secrets.DOCKER_REPO }}/brain-vitamin:prod leetaegyu/brain-vitamin:prod
         docker push leetaegyu/brain-vitamin:prod
           
-          # appleboy/ssh-action@master 액션을 사용하여 지정한 서버에 ssh로 접속, script 실행
-          # script의 내용 -> 도커의 기존 프로세스 제거, docker repo로부터 최신에 push한 내용을 pull 받아 실행하는 것
-          # 실행 시 docker-compose를 사용
-          - name: Deploy to server
-            uses: appleboy/ssh-action@master
-            id: deploy
-            with:
-              host: ${{ secrets.HOST }}
-              username: ubuntu
-              key: ${{ secrets.KEY }}
-              envs: GITHUB_SHA
-              script: |
-                cd /home/ubuntu/Brain-Vitamin-Backend/
-                sudo docker rm -f $(docker ps -qa)
-                sudo docker pull leetaegyu/brain-vitamin:prod
-                docker-compose -f docker-compose-prod.yml up --build
-                docker image prune -f
+    # appleboy/ssh-action@master 액션을 사용하여 지정한 서버에 ssh로 접속, script 실행
+    # script의 내용 -> 도커의 기존 프로세스 제거, docker repo로부터 최신에 push한 내용을 pull 받아 실행하는 것
+    # 실행 시 docker-compose를 사용
+    - name: Deploy to server
+      uses: appleboy/ssh-action@master
+      id: deploy
+      with:
+        host: ${{ secrets.HOST }}
+        username: ubuntu
+        key: ${{ secrets.KEY }}
+        envs: GITHUB_SHA
+        script: |
+          cd /home/ubuntu/Brain-Vitamin-Backend/
+          sudo docker rm -f $(docker ps -qa)
+          sudo docker pull leetaegyu/brain-vitamin:prod
+          docker-compose -f docker-compose-prod.yml up --build
+          docker image prune -f
 
 #  deploy-dev:
 #    runs-on: ubuntu-latest
