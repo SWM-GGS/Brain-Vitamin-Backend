@@ -38,4 +38,11 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 
+# Project settings
 application.yml
+application-dev.yml
+application-prod.yml
+
+# Logs
+tmp/
+logs/
