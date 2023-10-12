@@ -43,6 +43,7 @@ jobs:
     - name: Make application.yml
       run: |
           cd ./src/main/resources
+          ls
           touch ./application.yml
           echo "${{ secrets.BASE_YML }}" > ./application.yml
           touch ./application-prod.yml
@@ -77,10 +78,10 @@ jobs:
         key: ${{ secrets.KEY }}
         envs: GITHUB_SHA
         script: |
+          cd /home/ubuntu/Brain-Vitamin-Backend/
           sudo docker rm -f $(docker ps -qa)
           sudo docker pull leetaegyu/brain-vitamin:prod
-          cd /home/ubuntu/Brain-Vitamin-Backend/
-          docker-compose -f docker-compose-prod.yml up
+          docker-compose -f docker-compose-prod.yml up --build
           docker image prune -f
 
 #  deploy-dev:
