@@ -43,11 +43,11 @@ jobs:
       - name: Make application.yml
         run: |
           cd ./src/main/resources
-          ls
           touch ./application.yml
           echo "${{ secrets.BASE_YML }}" > ./application.yml
           touch ./application-prod.yml
           echo "${{ secrets.PROD_YML }}" > ./application-prod.yml
+          ls
         shell: bash
 
       # gradle을 통해 빌드
