@@ -77,7 +77,6 @@ jobs:
         key: ${{ secrets.KEY }}
         envs: GITHUB_SHA
         script: |
-          cd /home/ubuntu/Brain-Vitamin-Backend/
           sudo docker rm -f $(docker ps -qa)
           sudo docker pull leetaegyu/brain-vitamin:prod
           docker-compose -f docker-compose-prod.yml up
