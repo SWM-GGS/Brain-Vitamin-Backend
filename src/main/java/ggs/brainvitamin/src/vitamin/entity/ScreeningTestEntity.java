@@ -42,4 +42,16 @@ public class ScreeningTestEntity extends BaseEntity {
     @Column(nullable = false)
     private String answer;
 
+    @Column(nullable = false)
+    private Integer step;
+
+    @Column(nullable = false)
+    private Boolean mikeOn;
+
+    @Column(nullable = false)
+    private Integer trial;
+
+    @Column(nullable = false)
+    private Boolean hide;
+
 }
