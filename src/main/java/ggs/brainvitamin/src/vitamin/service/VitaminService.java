@@ -430,13 +430,21 @@ public class VitaminService {
             candidate.put("screeningTestId", screeningTestEntity.getId());
             candidate.put("audioUrl", screeningTestEntity.getAudioUrl());
             candidate.put("description", screeningTestEntity.getDescription());
+            candidate.put("step", screeningTestEntity.getStep());
+            candidate.put("mikeOn", screeningTestEntity.getMikeOn());
+            candidate.put("hide", screeningTestEntity.getHide());
+
 
              if (screeningTestEntity.getImgUrl() != null) {
-             candidate.put("imgUrl", screeningTestEntity.getImgUrl());
+                candidate.put("imgUrl", screeningTestEntity.getImgUrl());
              }
 
              if (screeningTestEntity.getId() == 57) {
                  candidate.put("timeLimit", screeningTestEntity.getTimeLimit());
+             }
+
+             if (screeningTestEntity.getTrial() > 0) {
+                 candidate.put("trial", screeningTestEntity.getTrial());
              }
 
             result.add(candidate);
