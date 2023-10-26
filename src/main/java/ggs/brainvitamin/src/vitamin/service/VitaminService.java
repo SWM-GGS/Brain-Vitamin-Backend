@@ -164,6 +164,11 @@ public class VitaminService {
 
             }
 
+            // 단어 기억하기 - 몇 단계 이후에 다시 맞추게 할지 추가
+            if (problemEntity.getTrainingName().equals("단어 기억하기")) {
+                candidate.put("showNext", random.nextInt(0, 4));
+            }
+
             ProblemDetailEntity problemDetailEntity = problemDetailRepository.findProblemDetailEntityByProblemAndAndDifficulty(problemEntity, randomDifficulty);
 
             candidate.put("problemPool", getPool(problemEntity, problemDetailEntity));
@@ -180,6 +185,34 @@ public class VitaminService {
         List<Map<String, Object>> result = new ArrayList<>();
 
         switch (problemEntity.getTrainingName()) {
+
+            case "단어 외우기":
+                // 일단 랜덤으로 10개를 뽑고, 난이도에 따라 갯수에 맞게 고르기
+                List<PoolMcEntity> poolMcEntitiesForWords = poolMcRepository.findRandom10();
+
+                // 난이도 별로 6, 8, 10개 고르기
+                Collections.shuffle(poolMcEntitiesForWords);
+                List<PoolMcEntity> selectedWords = poolMcEntitiesForWords.subList(0, problemDetailEntity.getElementSize()*2);
+
+                // 절반은 정답, 절반은 오답 처리해서 Map 형태로 반환
+                int count = 0;
+                int limit = problemDetailEntity.getElementSize();
+
+                for (PoolMcEntity selectedWord : selectedWords) {
+                    Map<String, Object> candidate = new HashMap<>();
+
+                    candidate.put("contents", selectedWord.getContents());
+                    if (count < limit) {
+                        candidate.put("answer", Boolean.TRUE);
+                        count++;
+                    } else {
+                        candidate.put("answer", Boolean.FALSE);
+                    }
+
+                    result.add(candidate);
+                }
+
+                break;
 
             case "카드 뒤집기":
                 // 일단 랜덤으로 6개를 뽑고, 난이도에 따라 다시 랜덤으로 뽑기
