@@ -186,7 +186,7 @@ public class VitaminService {
 
         switch (problemEntity.getTrainingName()) {
 
-            case "단어 외우기":
+            case "단어 기억하기":
                 // 일단 랜덤으로 10개를 뽑고, 난이도에 따라 갯수에 맞게 고르기
                 List<PoolMcEntity> poolMcEntitiesForWords = poolMcRepository.findRandom10();
 
