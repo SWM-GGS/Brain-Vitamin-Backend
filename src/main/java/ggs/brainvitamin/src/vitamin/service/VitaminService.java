@@ -235,6 +235,22 @@ public class VitaminService {
                 // 난이도만 넘겨주면 됨
                 break;
 
+            case "숫자 차례대로 터치하기":
+                // 난이도만 넘겨주면 됨
+                break;
+
+            case "글자의 색 선택하기":
+                // 넘겨줄 데이터 없음
+                break;
+
+            case "글자가 뜻하는 색 선택하기":
+                // 넘겨줄 데이터 없음
+                break;
+
+            case "글자 색과 뜻하는 색이 같은 것 선택하기":
+                // 넘겨줄 데이터 없음
+                break;
+
             case "합쳐진 숫자 찾기":
                 // 난이도만 넘겨주면 됨
                 break;
