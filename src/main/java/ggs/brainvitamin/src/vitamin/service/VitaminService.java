@@ -551,6 +551,8 @@ public class VitaminService {
                     case 57 -> checkTest15(text);
                     default -> 0;
                 };
+
+                result.put("text", text);
             }
         }
 
