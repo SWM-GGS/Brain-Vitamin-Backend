@@ -324,7 +324,26 @@ public class VitaminService {
                 break;
             case "오늘의 날짜 찾기":
                 // 난이도만 넘겨주면 됨
+                break;
 
+            case "가까운 시간 찾기":
+                // 넘겨줄 데이터 없음
+                break;
+
+            case "사칙연산 계산하기":
+                // 난이도만 넘겨주면 됨
+                break;
+
+            case "규칙에 맞는 숫자 찾기":
+                // 난이도만 넘겨주면 됨
+                break;
+
+            case "올바른 요일 찾기":
+                // 난이도만 넘겨주면 됨
+                break;
+
+            case "나침반 방향 찾기":
+                // 난이도만 넘겨주면 됨
                 break;
 
             default:
