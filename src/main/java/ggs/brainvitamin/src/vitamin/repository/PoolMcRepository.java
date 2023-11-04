@@ -14,6 +14,9 @@ public interface PoolMcRepository extends JpaRepository<PoolMcEntity, Long> {
     @Query(value = "SELECT * FROM pool_mc where problem_id = :problemId order by RAND() limit 8", nativeQuery = true)
     List<PoolMcEntity> findRandom8ByProblem(@Param(value = "problemId") Long problemId);
 
-    @Query(value = "SELECT * FROM pool_mc order by RAND() limit 10", nativeQuery = true)
-    List<PoolMcEntity> findRandom10();
+    @Query(value = "SELECT * FROM pool_mc where problem_id = :problemId order by RAND() limit 10", nativeQuery = true)
+    List<PoolMcEntity> findRandom10ByProblem(@Param(value = "problemId") Long problemId);
+
+    @Query(value = "SELECT * FROM pool_mc where problem_id = :problemId order by RAND() limit :elementSize", nativeQuery = true)
+    List<PoolMcEntity> findRandomNByProblem(@Param(value = "problemId") Long problemId, @Param(value = "elementSize") Integer elementSize);
 }

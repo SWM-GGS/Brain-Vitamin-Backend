@@ -164,8 +164,9 @@ public class VitaminService {
 
             }
 
-            // 단어 기억하기 - 몇 단계 이후에 다시 맞추게 할지 추가
-            if (problemEntity.getTrainingName().equals("단어 기억하기")) {
+            // 기억력 문제 - 몇 단계 이후에 다시 맞추게 할지 추가
+            if (problemEntity.getTrainingName().equals("단어 기억하기") ||
+                    problemEntity.getTrainingName().equals("국기-나라 매칭 기억하기")) {
                 candidate.put("showNext", random.nextInt(0, 4));
             }
 
@@ -183,25 +184,37 @@ public class VitaminService {
         Random random = new Random();
 
         List<Map<String, Object>> result = new ArrayList<>();
+        List<PoolMcEntity> poolMcEntities;
+        List<PoolSfEntity> poolSfEntities;
 
         switch (problemEntity.getTrainingName()) {
 
             case "단어 기억하기":
+            case "국기 기억하기":
                 // 일단 랜덤으로 10개를 뽑고, 난이도에 따라 갯수에 맞게 고르기
-                List<PoolMcEntity> poolMcEntitiesForWords = poolMcRepository.findRandom10();
+                poolMcEntities = poolMcRepository.findRandom10ByProblem(problemEntity.getId());
 
                 // 난이도 별로 6, 8, 10개 고르기
-                Collections.shuffle(poolMcEntitiesForWords);
-                List<PoolMcEntity> selectedWords = poolMcEntitiesForWords.subList(0, problemDetailEntity.getElementSize()*2);
+                Collections.shuffle(poolMcEntities);
+                List<PoolMcEntity> selectedSubjects = poolMcEntities.subList(0, problemDetailEntity.getElementSize()*2);
 
                 // 절반은 정답, 절반은 오답 처리해서 Map 형태로 반환
                 int count = 0;
                 int limit = problemDetailEntity.getElementSize();
 
-                for (PoolMcEntity selectedWord : selectedWords) {
+                for (PoolMcEntity selectedSubject : selectedSubjects) {
                     Map<String, Object> candidate = new HashMap<>();
 
-                    candidate.put("contents", selectedWord.getContents());
+                    // 단어 기억하기 문제일 때는 contents key 추가
+                    if (problemEntity.getTrainingName().equals("단어 기억하기")) {
+                        candidate.put("contents", selectedSubject.getContents());
+                    }
+
+                    // 국기 기억하기 문제일 때는 ImgUrl key 추가
+                    else if (problemEntity.getTrainingName().equals("국기 기억하기")) {
+                        candidate.put("ImgUrl", selectedSubject.getImgUrl());
+                    }
+
                     if (count < limit) {
                         candidate.put("answer", Boolean.TRUE);
                         count++;
@@ -231,8 +244,36 @@ public class VitaminService {
 
                 break;
 
+            case "국기-나라 매칭 기억하기":
+                poolMcEntities = poolMcRepository.findRandomNByProblem(problemEntity.getId(), problemDetailEntity.getElementSize());
+
+                for (PoolMcEntity poolMcEntity : poolMcEntities) {
+                    Map<String, Object> candidate = new HashMap<>();
+
+                    candidate.put("contents", poolMcEntity.getContents());
+                    candidate.put("imgUrl", poolMcEntity.getImgUrl());
+
+                    result.add(candidate);
+                }
+
             case "팔레트 따라 색칠하기":
                 // 난이도만 넘겨주면 됨
+                break;
+
+            case "숫자 차례대로 터치하기":
+                // 난이도만 넘겨주면 됨
+                break;
+
+            case "글자의 색 선택하기":
+                // 넘겨줄 데이터 없음
+                break;
+
+            case "글자가 뜻하는 색 선택하기":
+                // 넘겨줄 데이터 없음
+                break;
+
+            case "글자 색과 뜻하는 색이 같은 것 선택하기":
+                // 넘겨줄 데이터 없음
                 break;
 
             case "합쳐진 숫자 찾기":
@@ -240,17 +281,17 @@ public class VitaminService {
                 break;
 
             case "글자 조합해서 단어 만들기":
-                List<PoolMcEntity> poolMcEntities = poolMcRepository.findRandom8ByProblem(problemEntity.getId());
+                List<PoolMcEntity> poolMcEntitiesForWord = poolMcRepository.findRandom8ByProblem(problemEntity.getId());
 
-                Collections.shuffle(poolMcEntities);
+                Collections.shuffle(poolMcEntitiesForWord);
 
                 for (int i = 0; i < 8; i++) {
                     Map<String, Object> candidate = new HashMap<>();
 
-                    candidate.put("contents", poolMcEntities.get(i).getContents());
+                    candidate.put("contents", poolMcEntitiesForWord.get(i).getContents());
 
                     if (i < problemDetailEntity.getElementSize()) {
-                        candidate.put("imgUrl", poolMcEntities.get(i).getImgUrl());
+                        candidate.put("imgUrl", poolMcEntitiesForWord.get(i).getImgUrl());
                         candidate.put("answer", Boolean.TRUE);
                     } else {
                         candidate.put("answer", Boolean.FALSE);
@@ -260,8 +301,24 @@ public class VitaminService {
 
                 break;
 
+            case "거스름돈 계산하기":
+                poolSfEntities = poolSfRepository.findRandomN(problemDetailEntity.getElementSize());
+
+                for (PoolSfEntity poolSfEntity : poolSfEntities) {
+                    Map<String, Object> candidate = new HashMap<>();
+
+                    // 100원 단위로 가격 설정
+                    Integer randomPrice = random.nextInt(poolSfEntity.getMinRange()/100, poolSfEntity.getMaxRange()/100 + 1) * 100;
+
+                    candidate.put("contents", poolSfEntity.getElementName());
+                    candidate.put("imgUrl", poolSfEntity.getImgUrl());
+                    candidate.put("price", randomPrice);
+
+                    result.add(candidate);
+                }
+
             case "시장에서 쇼핑하기":
-                List<PoolSfEntity> poolSfEntities = poolSfRepository.findRandom3ByProblem(problemEntity.getId());
+                poolSfEntities = poolSfRepository.findRandom3ByProblem(problemEntity.getId());
                 for (PoolSfEntity poolSfEntity : poolSfEntities) {
                     Map<String, Object> candidate = new HashMap<>();
 
@@ -308,7 +365,26 @@ public class VitaminService {
                 break;
             case "오늘의 날짜 찾기":
                 // 난이도만 넘겨주면 됨
+                break;
 
+            case "가까운 시간 찾기":
+                // 넘겨줄 데이터 없음
+                break;
+
+            case "사칙연산 계산하기":
+                // 난이도만 넘겨주면 됨
+                break;
+
+            case "규칙에 맞는 숫자 찾기":
+                // 난이도만 넘겨주면 됨
+                break;
+
+            case "올바른 요일 찾기":
+                // 난이도만 넘겨주면 됨
+                break;
+
+            case "나침반 방향 찾기":
+                // 난이도만 넘겨주면 됨
                 break;
 
             default:
