@@ -12,4 +12,7 @@ import java.util.List;
 public interface PoolSfRepository extends JpaRepository<PoolSfEntity, Long> {
     @Query(value = "SELECT * FROM pool_sf where problem_id = :problemId order by RAND() limit 3", nativeQuery = true)
     List<PoolSfEntity> findRandom3ByProblem(@Param(value = "problemId") Long problemId);
+
+    @Query(value = "SELECT * FROM pool_sf order by RAND() limit :elementSize", nativeQuery = true)
+    List<PoolSfEntity> findRandomN(@Param(value = "elementSize") Integer problemId);
 }

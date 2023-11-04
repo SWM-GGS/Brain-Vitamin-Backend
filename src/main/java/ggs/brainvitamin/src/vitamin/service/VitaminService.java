@@ -185,6 +185,7 @@ public class VitaminService {
 
         List<Map<String, Object>> result = new ArrayList<>();
         List<PoolMcEntity> poolMcEntities;
+        List<PoolSfEntity> poolSfEntities;
 
         switch (problemEntity.getTrainingName()) {
 
@@ -300,8 +301,24 @@ public class VitaminService {
 
                 break;
 
+            case "거스름돈 계산하기":
+                poolSfEntities = poolSfRepository.findRandomN(problemDetailEntity.getElementSize());
+
+                for (PoolSfEntity poolSfEntity : poolSfEntities) {
+                    Map<String, Object> candidate = new HashMap<>();
+
+                    // 100원 단위로 가격 설정
+                    Integer randomPrice = random.nextInt(poolSfEntity.getMinRange()/100, poolSfEntity.getMaxRange()/100 + 1) * 100;
+
+                    candidate.put("contents", poolSfEntity.getElementName());
+                    candidate.put("imgUrl", poolSfEntity.getImgUrl());
+                    candidate.put("price", randomPrice);
+
+                    result.add(candidate);
+                }
+
             case "시장에서 쇼핑하기":
-                List<PoolSfEntity> poolSfEntities = poolSfRepository.findRandom3ByProblem(problemEntity.getId());
+                poolSfEntities = poolSfRepository.findRandom3ByProblem(problemEntity.getId());
                 for (PoolSfEntity poolSfEntity : poolSfEntities) {
                     Map<String, Object> candidate = new HashMap<>();
 
