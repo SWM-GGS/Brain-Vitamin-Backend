@@ -164,8 +164,9 @@ public class VitaminService {
 
             }
 
-            // 단어 기억하기 - 몇 단계 이후에 다시 맞추게 할지 추가
-            if (problemEntity.getTrainingName().equals("단어 기억하기")) {
+            // 기억력 문제 - 몇 단계 이후에 다시 맞추게 할지 추가
+            if (problemEntity.getTrainingName().equals("단어 기억하기") ||
+                    problemEntity.getTrainingName().equals("국기-나라 매칭 기억하기")) {
                 candidate.put("showNext", random.nextInt(0, 4));
             }
 
@@ -183,13 +184,14 @@ public class VitaminService {
         Random random = new Random();
 
         List<Map<String, Object>> result = new ArrayList<>();
+        List<PoolMcEntity> poolMcEntities;
 
         switch (problemEntity.getTrainingName()) {
 
             case "단어 기억하기":
             case "국기 기억하기":
                 // 일단 랜덤으로 10개를 뽑고, 난이도에 따라 갯수에 맞게 고르기
-                List<PoolMcEntity> poolMcEntities = poolMcRepository.findRandom10ByProblem(problemEntity.getId());
+                poolMcEntities = poolMcRepository.findRandom10ByProblem(problemEntity.getId());
 
                 // 난이도 별로 6, 8, 10개 고르기
                 Collections.shuffle(poolMcEntities);
@@ -240,6 +242,18 @@ public class VitaminService {
                 }
 
                 break;
+
+            case "국기-나라 매칭 기억하기":
+                poolMcEntities = poolMcRepository.findRandomNByProblem(problemEntity.getId(), problemDetailEntity.getElementSize());
+
+                for (PoolMcEntity poolMcEntity : poolMcEntities) {
+                    Map<String, Object> candidate = new HashMap<>();
+
+                    candidate.put("contents", poolMcEntity.getContents());
+                    candidate.put("imgUrl", poolMcEntity.getImgUrl());
+
+                    result.add(candidate);
+                }
 
             case "팔레트 따라 색칠하기":
                 // 난이도만 넘겨주면 됨
