@@ -53,14 +53,14 @@ public class PostEntity extends BaseEntity {
     private Long viewersCount;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<PostImgEntity> postImgEntityList = new ArrayList<>();
+    private List<PostImgEntity> postImgEntityList;
 
     @OneToMany(mappedBy = "post")
-    private List<CommentEntity> commentEntityList = new ArrayList<>();
+    private List<CommentEntity> commentEntityList;
 
     @OneToMany(mappedBy = "post")
     @OrderBy("createdAt asc")
-    private List<EmotionEntity> emotionEntityList = new ArrayList<>();
+    private List<EmotionEntity> emotionEntityList;
 
     public void increaseEmotionsCount() {
         this.emotionsCount++;

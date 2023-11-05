@@ -24,7 +24,7 @@ public class CommonCodeEntity {
 
     @OneToMany(mappedBy = "commonCode", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<CommonCodeDetailEntity> commonCodeDetailEntities = new ArrayList<>();
+    private List<CommonCodeDetailEntity> commonCodeDetailEntities;
 
 
 }
