@@ -166,6 +166,7 @@ public class VitaminService {
 
             // 기억력 문제 - 몇 단계 이후에 다시 맞추게 할지 추가
             if (problemEntity.getTrainingName().equals("단어 기억하기") ||
+                    problemEntity.getTrainingName().equals("국기 기억하기") ||
                     problemEntity.getTrainingName().equals("국기-나라 매칭 기억하기")) {
                 candidate.put("showNext", random.nextInt(0, 4));
             }
