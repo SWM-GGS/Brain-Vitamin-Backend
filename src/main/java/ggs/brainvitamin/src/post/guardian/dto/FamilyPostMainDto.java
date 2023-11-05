@@ -11,6 +11,6 @@ import java.util.List;
 @Builder
 public class FamilyPostMainDto {
 
-    private List<EmotionInfoDto> emotionInfoDtoList = new ArrayList<>();
-    private List<FamilyPostDto> familyPostDtoList = new ArrayList<>();
+    private List<EmotionInfoDto> emotionInfoDtoList;
+    private List<FamilyPostDto> familyPostDtoList;
 }

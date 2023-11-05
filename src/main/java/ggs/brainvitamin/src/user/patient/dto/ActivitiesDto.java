@@ -30,7 +30,7 @@ public class ActivitiesDto {
     @Builder
     public static class GetWeeklyVitaminDto {
 
-        private List<Boolean> weeklyVitaminAttendance = new ArrayList<>();
+        private List<Boolean> weeklyVitaminAttendance;
     }
 
     @Data

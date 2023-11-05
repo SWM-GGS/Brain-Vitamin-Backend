@@ -16,7 +16,7 @@ public class CommentDto {
     private String contents;
     private Long postId;
     private Long parentsId;
-    private List<CommentDto> childCommentList = new ArrayList<>();
+    private List<CommentDto> childCommentList;
     private String createdAt;
 
     // 작성자 정보

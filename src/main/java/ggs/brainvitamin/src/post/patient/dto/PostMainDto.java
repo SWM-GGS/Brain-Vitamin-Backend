@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class PostMainDto {
 
-    private List<PostPreviewDto> postPreviewDtoList = new ArrayList<>();
-    private List<CommonCodeDetailDto> emotionInfoDtoList = new ArrayList<>();
-    private List<FamilyMemberDto> familyMemberDtoList = new ArrayList<>();
+    private List<PostPreviewDto> postPreviewDtoList;
+    private List<CommonCodeDetailDto> emotionInfoDtoList;
+    private List<FamilyMemberDto> familyMemberDtoList;
 }
