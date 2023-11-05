@@ -80,7 +80,7 @@ jobs:
           script: |
             cd /home/ubuntu/Brain-Vitamin-Backend/
             sudo docker rm -f $(docker ps -qa)
-            sudo docker pull leetaegyu/brain-vitamin:prod
+            sudo docker pull leetaegyu/brain-vitamin
             docker-compose -f docker-compose-prod.yml up --build
             docker image prune -f
 

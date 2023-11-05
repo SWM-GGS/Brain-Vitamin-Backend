@@ -39,7 +39,7 @@ public class ActivitiesDto {
 
         private Integer totalScore;
         private String state;
-        private String description = "";
+        private String description;
         private String testDate;
 
 //        private Integer attentionScore;     // 집중력
