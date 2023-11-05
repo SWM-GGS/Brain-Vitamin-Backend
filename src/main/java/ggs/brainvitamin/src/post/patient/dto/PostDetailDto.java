@@ -28,11 +28,11 @@ public class PostDetailDto {
 
     // 조회자 정보
     private Long viewersCount;
-    private List<ViewerDto> viewerDtoList = new ArrayList<>();
+    private List<ViewerDto> viewerDtoList;
 
     // 감정표현 정보
     private Long emotionsCount;
-    private List<EmotionDto> emotionDtoList = new ArrayList<>();
+    private List<EmotionDto> emotionDtoList;
 
     // 댓글 정보
     private Long commentsCount;
