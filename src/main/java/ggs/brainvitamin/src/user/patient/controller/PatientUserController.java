@@ -4,6 +4,7 @@ import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.common.service.CommonCodeService;
+import ggs.brainvitamin.src.user.patient.dto.FamilyPictureDto;
 import ggs.brainvitamin.src.user.patient.dto.FontSizeDto;
 import ggs.brainvitamin.src.user.patient.dto.PatientUserDto;
 import ggs.brainvitamin.src.user.patient.dto.ProfilesRequestDto;
@@ -108,6 +109,25 @@ public class PatientUserController {
             patientUserService.updatePhoneNumber(Long.parseLong(userId), phoneNumberDto.getPhoneNumber());
 
             return new BaseResponse<>("전화번호가 성공적으로 저장되었습니다.");
+
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @PostMapping("/family-stories/pictures")
+    @PreAuthorize("hasAnyRole('ROLE_USER')")
+    @Operation(summary = "환자 가족 사진 추가", description = "")
+    public BaseResponse<String> createFamilyPicture(@Valid @RequestBody FamilyPictureDto familyPictureDto) {
+
+        try {
+            // 현재 로그인한 유저의 id값 조회
+            String userId = SecurityUtil.getCurrentUserId()
+                    .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
+
+            patientUserService.createFamilyPicture(Long.parseLong(userId), familyPictureDto);
+
+            return new BaseResponse<>("환자 가족 사진이 성공적으로 저장되었습니다.");
 
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
