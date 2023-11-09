@@ -530,7 +530,7 @@ public class VitaminService {
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
-        List<ScreeningTestEntity> screeningTestEntities = screeningTestRepository.findAllByStatus(Status.INACTIVE);
+        List<ScreeningTestEntity> screeningTestEntities = screeningTestRepository.findAllByStatus(Status.ACTIVE);
 
         List<Map<String, Object>> result = new ArrayList<>();
 
