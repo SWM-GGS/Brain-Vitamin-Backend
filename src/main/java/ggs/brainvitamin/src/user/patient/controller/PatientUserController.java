@@ -37,7 +37,7 @@ public class PatientUserController {
 
     @GetMapping("/activities")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_PATIENT')")
-    @Operation(summary = "환자 내 활동 보기 데이터 조회", description = "")
+    @Operation(summary = "환자 내 활동 보기 데이터 조회")
     public BaseResponse<ActivitiesResponseDto> getActivities() {
         try {
             String currentUserId = SecurityUtil.getCurrentUserId()
@@ -45,8 +45,6 @@ public class PatientUserController {
             Long userId = Long.parseLong(currentUserId);
 
             LocalDateTime today = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
-            System.out.println("today = " + today);
 
             // 이번주 간 비타민 참여 여부 조회
             GetWeeklyVitaminDto weeklyVitaminDto =
