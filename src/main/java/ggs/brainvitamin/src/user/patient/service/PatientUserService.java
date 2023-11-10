@@ -7,10 +7,10 @@ import ggs.brainvitamin.jwt.TokenProvider;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.user.entity.AuthorityEntity;
+import ggs.brainvitamin.src.user.entity.FamilyPictureEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
-import ggs.brainvitamin.src.user.patient.dto.ActivitiesDto;
-import ggs.brainvitamin.src.user.patient.dto.ProfilesRequestDto;
-import ggs.brainvitamin.src.user.patient.dto.TokenDto;
+import ggs.brainvitamin.src.user.patient.dto.*;
+import ggs.brainvitamin.src.user.repository.FamilyPictureRepository;
 import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,7 @@ import static ggs.brainvitamin.src.user.patient.dto.TokenDto.*;
 public class PatientUserService {
 
     private final UserRepository userRepository;
+    private final FamilyPictureRepository familyPictureRepository;
     private final TokenProvider tokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -261,5 +262,52 @@ public class PatientUserService {
                 refreshToken.getRefreshTokenExpiresTime(),
                 TimeUnit.MILLISECONDS
         );
+    }
+
+    public void createFamilyPicture(Long userId, FamilyPictureDto familyPictureDto) {
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        FamilyPictureEntity familyPictureEntity = new FamilyPictureEntity(
+                userEntity,
+                familyPictureDto.getImgUrl(),
+                familyPictureDto.getSeason(),
+                familyPictureDto.getYear(),
+                familyPictureDto.getPlace(),
+                familyPictureDto.getHeadCount());
+
+        if (!familyPictureDto.getFamilyRelations().isEmpty()) {
+            List<Integer> familyRelations = familyPictureDto.getFamilyRelations();
+
+            String str = familyRelations.toString().replaceAll("[^0-9 ]","");
+            System.out.println(str);
+
+            familyPictureEntity.setFamilyRelations(str);
+        }
+
+        familyPictureRepository.save(familyPictureEntity);
+    }
+
+    public List<Map<String, Object>> getFamilyPicture(Long userId) {
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        List<Map<String, Object>> responseList= new ArrayList<>();
+
+        List<FamilyPictureEntity> familyPictures = familyPictureRepository.findAllByUserAndStatus(userEntity, Status.ACTIVE);
+
+        if (!familyPictures.isEmpty()) {
+
+            for (FamilyPictureEntity familyPicture : familyPictures) {
+                Map<String, Object> candidate = new HashMap<>();
+
+                candidate.put("pictureId", familyPicture.getId());
+                candidate.put("imgUrl", familyPicture.getImgUrl());
+
+                responseList.add(candidate);
+            }
+
+        }
+        return responseList;
     }
 }
