@@ -279,6 +279,15 @@ public class PatientUserService {
                 familyPictureDto.getPlace(),
                 familyPictureDto.getHeadCount());
 
+        if (!familyPictureDto.getFamilyRelations().isEmpty()) {
+            List<Integer> familyRelations = familyPictureDto.getFamilyRelations();
+
+            String str = familyRelations.toString().replaceAll("[^0-9 ]","");
+            System.out.println(str);
+
+            familyPictureEntity.setFamilyRelations(str);
+        }
+
         familyPictureRepository.save(familyPictureEntity);
     }
 }
