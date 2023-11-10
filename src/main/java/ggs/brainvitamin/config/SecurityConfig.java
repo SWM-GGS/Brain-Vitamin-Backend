@@ -40,7 +40,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("https://localhost:5173",
+        config.setAllowedOrigins(List.of("http://localhost:5173",
                 "https://brain-vitamin-web-front-deploy.s3-website.ap-northeast-2.amazonaws.com",
                 "https://dqr7en7diq4ph.cloudfront.net"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
