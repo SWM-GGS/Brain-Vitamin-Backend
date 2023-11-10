@@ -41,6 +41,9 @@ public class FamilyPictureEntity extends BaseEntity {
     @Column(nullable = false)
     private Integer headCount;
 
+    @Column
+    private String familyRelations;
+
     public FamilyPictureEntity(UserEntity user, String imgUrl, Season season, Integer year, String place, Integer headCount) {
         this.user = user;
         this.imgUrl = imgUrl;
@@ -48,5 +51,9 @@ public class FamilyPictureEntity extends BaseEntity {
         this.year = year;
         this.place = place;
         this.headCount = headCount;
+    }
+
+    public void setFamilyRelations(String familyRelations) {
+        this.familyRelations = familyRelations;
     }
 }
