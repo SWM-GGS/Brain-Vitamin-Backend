@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class FamilyPictureDto {
@@ -28,4 +30,8 @@ public class FamilyPictureDto {
     @Min(value = 1800, message = "잘못된 년도입니다")
     @Max(value = 3000, message = "잘못된 년도입니다")
     private Integer year;
+
+    @Size(max = 30, message = "잘못된 가족 관계입니다")
+    private List<Integer> FamilyRelations;
+
 }
