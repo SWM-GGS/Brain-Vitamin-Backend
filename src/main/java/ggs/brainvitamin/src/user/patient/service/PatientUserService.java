@@ -9,10 +9,7 @@ import ggs.brainvitamin.src.common.entity.CommonCodeDetailEntity;
 import ggs.brainvitamin.src.user.entity.AuthorityEntity;
 import ggs.brainvitamin.src.user.entity.FamilyPictureEntity;
 import ggs.brainvitamin.src.user.entity.UserEntity;
-import ggs.brainvitamin.src.user.patient.dto.ActivitiesDto;
-import ggs.brainvitamin.src.user.patient.dto.FamilyPictureDto;
-import ggs.brainvitamin.src.user.patient.dto.ProfilesRequestDto;
-import ggs.brainvitamin.src.user.patient.dto.TokenDto;
+import ggs.brainvitamin.src.user.patient.dto.*;
 import ggs.brainvitamin.src.user.repository.FamilyPictureRepository;
 import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.utils.SecurityUtil;
@@ -267,7 +264,7 @@ public class PatientUserService {
         );
     }
 
-    public void createFamilyPicture(long userId, FamilyPictureDto familyPictureDto) {
+    public void createFamilyPicture(Long userId, FamilyPictureDto familyPictureDto) {
         UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
@@ -289,5 +286,28 @@ public class PatientUserService {
         }
 
         familyPictureRepository.save(familyPictureEntity);
+    }
+
+    public List<Map<String, Object>> getFamilyPicture(Long userId) {
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
+
+        List<Map<String, Object>> responseList= new ArrayList<>();
+
+        List<FamilyPictureEntity> familyPictures = familyPictureRepository.findAllByUserAndStatus(userEntity, Status.ACTIVE);
+
+        if (!familyPictures.isEmpty()) {
+
+            for (FamilyPictureEntity familyPicture : familyPictures) {
+                Map<String, Object> candidate = new HashMap<>();
+
+                candidate.put("pictureId", familyPicture.getId());
+                candidate.put("imgUrl", familyPicture.getImgUrl());
+
+                responseList.add(candidate);
+            }
+
+        }
+        return responseList;
     }
 }
