@@ -4,10 +4,7 @@ import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.BaseResponse;
 import ggs.brainvitamin.src.common.dto.CommonCodeDetailDto;
 import ggs.brainvitamin.src.common.service.CommonCodeService;
-import ggs.brainvitamin.src.user.patient.dto.FamilyPictureDto;
-import ggs.brainvitamin.src.user.patient.dto.FontSizeDto;
-import ggs.brainvitamin.src.user.patient.dto.PatientUserDto;
-import ggs.brainvitamin.src.user.patient.dto.ProfilesRequestDto;
+import ggs.brainvitamin.src.user.patient.dto.*;
 import ggs.brainvitamin.src.user.patient.service.PatientUserService;
 import ggs.brainvitamin.src.vitamin.service.ScreeningTestHistoryService;
 import ggs.brainvitamin.src.vitamin.service.VitaminAnalyticsService;
@@ -145,6 +142,25 @@ public class PatientUserController {
                     .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
 
             List<Map<String, Object>> responseMap = patientUserService.getFamilyPicture(Long.parseLong(userId));
+
+            return new BaseResponse<>(responseMap);
+
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @GetMapping("/family-stories/problems")
+    @PreAuthorize("hasAnyRole('ROLE_USER')")
+    @Operation(summary = "가족 사진 기반 문제 조회", description = "")
+    public BaseResponse<List<FamilyPictureProblemDto>> getFamilyPictureProblems() {
+
+        try {
+            // 현재 로그인한 유저의 id값 조회
+            String userId = SecurityUtil.getCurrentUserId()
+                    .orElseThrow(() -> new BaseException(INVALID_LOGIN_INFO));
+
+            List<FamilyPictureProblemDto> responseMap = patientUserService.getFamilyPictureProblems(Long.parseLong(userId));
 
             return new BaseResponse<>(responseMap);
 
