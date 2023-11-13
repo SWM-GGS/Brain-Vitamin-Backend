@@ -31,6 +31,7 @@ public class FamilyPictureDto {
     @Max(value = 3000, message = "잘못된 년도입니다")
     private Integer year;
 
+    @NotNull(message = "가족 관계를 입력해주세요")
     @Size(max = 30, message = "잘못된 가족 관계입니다")
     private List<Integer> FamilyRelations;
 
