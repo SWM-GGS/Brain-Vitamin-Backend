@@ -41,7 +41,7 @@ public class SecurityConfig {
 
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of("http://localhost:5173",
-                "http://brain-vitamin",
+                "http://brain-vitamin.com",
                 "http://brain-vitamin-web-front-deploy.s3-website.ap-northeast-2.amazonaws.com",
                 "https://dqr7en7diq4ph.cloudfront.net"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
