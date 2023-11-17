@@ -571,9 +571,52 @@ public class VitaminService {
 
         screeningTestHistoryRepository.save(screeningTestHistoryEntity);
 
+        LocalDate now = LocalDate.now();
+
+        // 만 나이
+        // 일단 현재 연도와 태어난 연도 빼기
+        int age = now.minusYears(userEntity.getBirthDate().getYear()).getYear();
+
+        // 생일이 지났는지 여부를 판단하기 위해 위의 연도 차이를 생년월일의 연도에 더한다.
+        // 연도가 같아짐으로 생년월일만 판단할 수 있음
+        if (userEntity.getBirthDate().plusYears(age).isAfter(now)) {
+            age = age -1;
+        }
+
+        String education = userEntity.getEducationCode().getCodeDetailName();// 무학, 초졸, 중졸, 고졸, 대졸
+
+        // 교육 수준과 만 나이에 대한 점수 규준
+        int[][] standard = {
+                {18, 22, 24, 26, 27},
+                {16, 21, 23, 25, 26},
+                {14, 19, 22, 22, 25},
+                {11, 16, 18, 20, 22}};
+
+        int row = 0;
+        if (age >= 50 & age < 90) {
+            row = (age - 50) / 10;
+        }
+        else if (age >= 90) {
+            row = 3;
+        }
+
+        int col = 0;
+        if (education.equals("초졸")) {
+            col = 1;
+        }
+        else if (education.equals("중졸")) {
+            col = 2;
+        }
+        else if (education.equals("고졸")) {
+            col = 3;
+        }
+        else if (education.equals("대졸")) {
+            col = 4;
+        }
+
         HashMap<String, Object> result = new HashMap<>();
 
-        if (postScreeningTestDto.getScore() >= 8) {
+        if (postScreeningTestDto.getScore() < standard[row][col]) {
             result.put("cogLevel", "의심");
         }
         else {
