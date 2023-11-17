@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
@@ -1063,6 +1064,38 @@ public class VitaminService {
         return 0;
     }
     private int checkTest15(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"의 문장에서 중복되는 과일 또는 채소를 제외하고 총 몇 개의 과일 또는 채소가 있나요? \n" +
+                "\n" +
+                "참고로  개수를 셀 때는 아래의 3가지는 제외해주세요.\n" +
+                "1. 과일/채소를 가공한 음식 : 무말랭이, 감말랭이, 홍시, 연시, 곶감, 건포도, 시래기 등\n" +
+                "2. 곡류, 잡곡류 : 콩, 팥, 쌀, 수수, 조, 보리, 귀리, 율무, 녹두 등\n" +
+                "3. 해조류 : 미역, 파래, 곰피, 다시마, 톳 등\n" +
+                "\n" +
+                "답변은 설명없이 개수만 알려주세요.\n" +
+                "예를 들어 답변 예시는 5 입니다. 숫자만 답해주세요.";
+
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        System.out.println("답변: " + afterStr);
+
+        // GPT 응답이 숫자로 잘 오는 경우
+        if (Pattern.matches("^[0-9]*$", afterStr)) {
+            int count = Integer.parseInt(afterStr);
+
+            if (count >= 15) {
+                return 2;
+            }
+            else if (count >= 9) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+
+        }
 
         return 0;
     }
