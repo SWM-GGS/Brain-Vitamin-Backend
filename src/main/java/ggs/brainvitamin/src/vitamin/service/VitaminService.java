@@ -720,7 +720,7 @@ public class VitaminService {
         else {
             result.put("isCorrect", false);
             result.put("score", 0);
-            result.put("description", "문제 풀이에 실패하였습니다.");
+            result.put("description", "다시 한번 말씀해주세요.");
 
             if (postScreeningTestDetailDto.getCount() == 2) {
                 result.put("stop", true);
