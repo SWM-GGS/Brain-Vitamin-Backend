@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 import static ggs.brainvitamin.src.user.patient.dto.PatientUserDto.*;
@@ -460,18 +462,29 @@ public class PatientUserService {
             String beforeStr1 = familyPictureEntity.getPlace() + "와 비슷한 대한민국 장소 하나를 설명없이 장소명만 알려줘.";
             float temperature = 0.6f;
 
+            Pattern p = Pattern.compile("([가-힣|\s]+)");	// 검색할 문자열 패턴 : 한글, 공백 문자
+
             // GPT 응답
             String afterStr1 = getGptResponseText(chatService.getChatResponse(beforeStr1, temperature, 500)).trim();
 
-            String beforeStr2 = familyPictureEntity.getPlace() + "와 비슷한 대한민국 장소 하나를 설명없이 장소명만 알려줘.";
+            Matcher m = p.matcher(afterStr1);
+            if (m.find()) {
+                afterStr1 = m.group();
+            }
+
+            String beforeStr2 = familyPictureEntity.getPlace() + "와 비슷한 대한민국 장소 하나를 설명없이 장소명만 알려줘. 답변에 " + afterStr1 + "는 제외하고 알려줘";
 
             // GPT 응답
             String afterStr2 = getGptResponseText(chatService.getChatResponse(beforeStr2, temperature, 500)).trim();
 
-            while (afterStr2.equals(afterStr1)) {
+            while (afterStr2.contains(afterStr1) | afterStr2.contains(familyPictureEntity.getPlace())) {
                 afterStr2 = getGptResponseText(chatService.getChatResponse(beforeStr2, temperature, 500)).trim();
             }
 
+            m = p.matcher(afterStr2);
+            if (m.find()) {
+                afterStr2 = m.group();
+            }
 
             String[] candidate = new String[3];
             candidate[answerIndex] = familyPictureEntity.getPlace();
