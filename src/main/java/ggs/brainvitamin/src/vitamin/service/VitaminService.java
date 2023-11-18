@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static ggs.brainvitamin.config.BaseResponseStatus.*;
 
@@ -571,9 +572,52 @@ public class VitaminService {
 
         screeningTestHistoryRepository.save(screeningTestHistoryEntity);
 
+        LocalDate now = LocalDate.now();
+
+        // 만 나이
+        // 일단 현재 연도와 태어난 연도 빼기
+        int age = now.minusYears(userEntity.getBirthDate().getYear()).getYear();
+
+        // 생일이 지났는지 여부를 판단하기 위해 위의 연도 차이를 생년월일의 연도에 더한다.
+        // 연도가 같아짐으로 생년월일만 판단할 수 있음
+        if (userEntity.getBirthDate().plusYears(age).isAfter(now)) {
+            age = age -1;
+        }
+
+        String education = userEntity.getEducationCode().getCodeDetailName();// 무학, 초졸, 중졸, 고졸, 대졸
+
+        // 교육 수준과 만 나이에 대한 점수 규준
+        int[][] standard = {
+                {18, 22, 24, 26, 27},
+                {16, 21, 23, 25, 26},
+                {14, 19, 22, 22, 25},
+                {11, 16, 18, 20, 22}};
+
+        int row = 0;
+        if (age >= 50 & age < 90) {
+            row = (age - 50) / 10;
+        }
+        else if (age >= 90) {
+            row = 3;
+        }
+
+        int col = 0;
+        if (education.equals("초졸")) {
+            col = 1;
+        }
+        else if (education.equals("중졸")) {
+            col = 2;
+        }
+        else if (education.equals("고졸")) {
+            col = 3;
+        }
+        else if (education.equals("대졸")) {
+            col = 4;
+        }
+
         HashMap<String, Object> result = new HashMap<>();
 
-        if (postScreeningTestDto.getScore() >= 8) {
+        if (postScreeningTestDto.getScore() < standard[row][col]) {
             result.put("cogLevel", "의심");
         }
         else {
@@ -677,7 +721,7 @@ public class VitaminService {
         else {
             result.put("isCorrect", false);
             result.put("score", 0);
-            result.put("description", "문제 풀이에 실패하였습니다.");
+            result.put("description", "다시 한번 말씀해주세요.");
 
             if (postScreeningTestDetailDto.getCount() == 2) {
                 result.put("stop", true);
@@ -1020,6 +1064,38 @@ public class VitaminService {
         return 0;
     }
     private int checkTest15(String text) {
+        // 수정 전 문자열
+        String beforeStr = "\"" + text + "\"의 문장에서 중복되는 과일 또는 채소를 제외하고 총 몇 개의 과일 또는 채소가 있나요? \n" +
+                "\n" +
+                "참고로  개수를 셀 때는 아래의 3가지는 제외해주세요.\n" +
+                "1. 과일/채소를 가공한 음식 : 무말랭이, 감말랭이, 홍시, 연시, 곶감, 건포도, 시래기 등\n" +
+                "2. 곡류, 잡곡류 : 콩, 팥, 쌀, 수수, 조, 보리, 귀리, 율무, 녹두 등\n" +
+                "3. 해조류 : 미역, 파래, 곰피, 다시마, 톳 등\n" +
+                "\n" +
+                "답변은 설명없이 개수만 알려주세요.\n" +
+                "예를 들어 답변 예시는 5 입니다. 숫자만 답해주세요.";
+
+        float temperature = 0.5f;
+        // GPT로 text 수정
+        String afterStr = getGptResponseText(chatService.getChatResponse(beforeStr, temperature, 500)).trim();
+
+        System.out.println("답변: " + afterStr);
+
+        // GPT 응답이 숫자로 잘 오는 경우
+        if (Pattern.matches("^[0-9]*$", afterStr)) {
+            int count = Integer.parseInt(afterStr);
+
+            if (count >= 15) {
+                return 2;
+            }
+            else if (count >= 9) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+
+        }
 
         return 0;
     }
