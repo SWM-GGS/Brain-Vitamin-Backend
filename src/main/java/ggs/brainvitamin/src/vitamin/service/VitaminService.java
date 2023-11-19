@@ -679,7 +679,7 @@ public class VitaminService {
                     // 제가 불러드리는 말을 끝에서부터 거꾸로 따라 해 주세요
                     case 41 -> checkTest8(text);
 
-                    // 제가 불러드리는 말을 끝에서부터 거꾸로 따라 해 주세요
+                    // 제가 조금 전에 외우라고 불러드렸던 문장을 다시 한번 말씀해 주세요
                     case 51 -> {
                         Map<String, Object> checkMap = checkTest10(text);
 
