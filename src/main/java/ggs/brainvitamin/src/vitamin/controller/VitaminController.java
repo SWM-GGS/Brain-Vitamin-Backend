@@ -123,7 +123,24 @@ public class VitaminController {
      */
     @Operation(summary = "인지 선별검사 문제별 답안 제출", description = "")
     @PostMapping("/vitamins/screening-test/detail")
-    public BaseResponse<Map<String, Object>> submitScreeningTest(
+    public BaseResponse<Map<String, Object>> submitScreeningTest(@Valid @RequestBody PostScreeningTestDetailDto postScreeningTestDetailDto) {
+        try {
+            Long userId = getUserId();
+
+            Map<String, Object> responseMap = vitaminService.checkScreeningTestDetail(userId, postScreeningTestDetailDto);
+
+            return new BaseResponse<>(responseMap);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 인지 선별검사 문제별 답안 제출 테스트
+     */
+    @Operation(summary = "인지 선별검사 문제별 답안 제출 테스트", description = "")
+    @PostMapping("/vitamins/screening-test/detail/test")
+    public BaseResponse<Map<String, Object>> submitScreeningTestTemp(
             @RequestPart(name = "audioFile", required = false) MultipartFile multipartFile,
             @RequestParam String jsonData) {
         try {
