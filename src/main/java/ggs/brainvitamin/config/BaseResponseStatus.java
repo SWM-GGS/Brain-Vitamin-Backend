@@ -102,6 +102,10 @@ public enum BaseResponseStatus {
     ALREADY_JOINED_FAMILY(false, 2952, "이미 가입한 가족 그룹입니다."),
     MEMBER_NOT_EXISTS(false, 2953, "가족 그룹에 멤버가 존재하지 않습니다."),
 
+    FAILED_TO_CONVERT_JSON(false, 2990, "json data 변환에 실패하였습니다."),
+    FAILED_TO_SAVE_AUDIO_FILE(false, 2990, "s3 파일 저장에 실패하였습니다."),
+
+
     /**
      * 3000 : Response 오류
      */
