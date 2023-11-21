@@ -94,6 +94,7 @@ public class PatientAuthController {
             // 사용자 정보 바탕으로 가족 코드 조회
             FamilyDto familyInfo = patientFamilyService.getFamilyInfo(loginResponseDto.getPatientDetailDto().getId());
             loginResponseDto.getPatientDetailDto().setFamilyKey(familyInfo.getFamilyKey());
+            loginResponseDto.getPatientDetailDto().setFamilyId(familyInfo.getId());
 
             return new BaseResponse<>(loginResponseDto);
 

@@ -16,6 +16,7 @@ public class PatientUserDto {
         private String phoneNumber;
         private Integer fontSize;
         private String familyKey;
+        private Long familyId;
     }
 
     @Data
