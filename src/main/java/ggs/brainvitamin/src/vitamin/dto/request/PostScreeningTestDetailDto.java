@@ -26,8 +26,7 @@ public class PostScreeningTestDetailDto {
     @Max(value = 3, message = "잘못된 횟수 입니다")
     private Integer count;
 
-    @Pattern(regexp = "((http[s]?|ftp):\\/\\/)?(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=가-힣]{1,256}[:|\\.][a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+,.~#?&\\/=가-힣]*)", message = "잘못된 URL 링크입니다.")
-    private String audioFileUrl;
+    private String audioContent;
 
     private List<Integer> firstVertex;
 
