@@ -721,7 +721,8 @@ public class VitaminService {
             result.put("score", 0);
             result.put("description", "다시 한번 말씀해주세요.");
 
-            if (postScreeningTestDetailDto.getCount() == 2) {
+            // 문제 풀이 시도 횟수가 2회 또는 모눈종이 그림 따라 그리기 문제인 경우 stop
+            if (postScreeningTestDetailDto.getCount() == 2 | postScreeningTestDetailDto.getScreeningTestId() == 42) {
                 result.put("stop", true);
             }
             else {
