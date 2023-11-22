@@ -646,42 +646,40 @@ public class VitaminService {
         }
         // 오디오 파일이 있는 문제
         else {
-            Map speechToText = clovaSpeechService.getSpeechToText(postScreeningTestDetailDto.getAudioFileUrl());
+            String audioContent = postScreeningTestDetailDto.getAudioContent();
 
             // STT 변환에 성공한 경우
-            if (speechToText.get("message").equals("Succeeded")) {
-                String text = String.valueOf(speechToText.get("text"));
-
+            if (!audioContent.isEmpty()) {
                 correct = switch (postScreeningTestDetailDto.getScreeningTestId().intValue()) {
                     // 올해는 몇 년도입니까?
-                    case 31 -> checkTest1(text);
+                    case 31 -> checkTest1(audioContent);
 
                     // 지금은 몇 월입니까?
-                    case 32 -> checkTest2(text);
+                    case 32 -> checkTest2(audioContent);
 
                     // 오늘은 며칠입니까?
-                    case 33 -> checkTest3(text);
+                    case 33 -> checkTest3(audioContent);
 
                     // 오늘은 무슨 요일입니까?
-                    case 34 -> checkTest4(text);
+                    case 34 -> checkTest4(audioContent);
 
                     // 현재 검사자께서 살고계시는 나라는 어디입니까?
-                    case 35 -> checkTest5(text);
+                    case 35 -> checkTest5(audioContent);
 
                     // 제가 불러드리는 숫자를 그대로 따라 해 주세요
                     // 1번
-                    case 38 -> checkTest6(text);
+                    case 38 -> checkTest6(audioContent);
 
                     // 제가 불러드리는 숫자를 그대로 따라 해 주세요.
                     // 2번
-                    case 39 -> checkTest7(text);
+                    case 39 -> checkTest7(audioContent);
 
                     // 제가 불러드리는 말을 끝에서부터 거꾸로 따라 해 주세요
-                    case 41 -> checkTest8(text);
+                    case 41 -> checkTest8(audioContent);
 
                     // 제가 조금 전에 외우라고 불러드렸던 문장을 다시 한번 말씀해 주세요
                     case 51 -> {
-                        Map<String, Object> checkMap = checkTest10(text);
+                        Map<String, Object> checkMap = checkTest10(audioContent);
 
                         List<?> forgetIndex = convertObjectToList(checkMap.get("forgetIndex"));
                         result.put("forgetIndex", forgetIndex);
@@ -690,23 +688,23 @@ public class VitaminService {
                     }
 
                     // 이것을 무엇입니까? (칫솔)
-                    case 53 -> checkTest11(text);
+                    case 53 -> checkTest11(audioContent);
 
                     // 이것을 무엇입니까? (그네)
-                    case 54 -> checkTest12(text);
+                    case 54 -> checkTest12(audioContent);
 
                     // 이것을 무엇입니까? (주사위)
-                    case 55 -> checkTest13(text);
+                    case 55 -> checkTest13(audioContent);
 
                     // 박수를 두번 치고, 조금 쉬었다가 한번 더 쳐주세요
-                    case 56 -> checkTest14(text);
+                    case 56 -> checkTest14(audioContent);
 
                     // 지금부터 1분 동안 과일이나 채소를 최대한 많이 이야기 해 주세요. 준비되셨지요? 자, 과일이나 채소 이름을 말씀해 주세요
-                    case 57 -> checkTest15(text);
+                    case 57 -> checkTest15(audioContent);
                     default -> 0;
                 };
 
-                result.put("text", text);
+                result.put("text", audioContent);
             }
         }
 
