@@ -136,59 +136,6 @@ public class VitaminController {
     }
 
     /**
-     * 인지 선별검사 문제별 답안 제출 테스트
-     */
-    @Operation(summary = "인지 선별검사 문제별 답안 제출 테스트", description = "")
-    @PostMapping("/vitamins/screening-test/detail/test")
-    public BaseResponse<Map<String, Object>> submitScreeningTestTemp(
-            @RequestPart(name = "audioFile", required = false) MultipartFile multipartFile,
-            @RequestParam String jsonData) {
-        try {
-            Long userId = getUserId();
-
-            PostScreeningTestDetailDto postScreeningTestDetailDto = convertJsonData(jsonData);
-
-            postScreeningTestDetailDto = updatePostScreeningTestDetailDto(postScreeningTestDetailDto, multipartFile);
-
-            Map<String, Object> responseMap = vitaminService.checkScreeningTestDetail(
-                    userId,
-                    postScreeningTestDetailDto);
-
-            return new BaseResponse<>(responseMap);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
-    private PostScreeningTestDetailDto convertJsonData(String jsonData) throws BaseException {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper()
-                    .registerModule(new SimpleModule());
-            PostScreeningTestDetailDto postScreeningTestDetailDto = objectMapper.readValue(jsonData, new TypeReference<>() {});
-
-            return postScreeningTestDetailDto;
-        }
-        catch (Exception exception) {
-            throw new BaseException(FAILED_TO_CONVERT_JSON);
-        }
-    }
-
-    private PostScreeningTestDetailDto updatePostScreeningTestDetailDto(PostScreeningTestDetailDto postScreeningTestDetailDto, MultipartFile multipartFile) throws BaseException {
-        try {
-            if (postScreeningTestDetailDto.getScreeningTestId() != 42) {
-                String fileUrl = s3UploadService.saveFile(multipartFile);
-
-                postScreeningTestDetailDto.setAudioFileUrl(fileUrl);
-            }
-
-            return postScreeningTestDetailDto;
-        }
-        catch (Exception exception) {
-            throw new BaseException(FAILED_TO_SAVE_AUDIO_FILE);
-        }
-    }
-
-    /**
      * 인지 선별검사 제출
      */
     @Operation(summary = "인지 선별검사 제출", description = "")
