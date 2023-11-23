@@ -130,7 +130,9 @@ public class VitaminService {
             throw new BaseException(INVALID_USERTYPE);
         }
 
-        List<ProblemEntity> problemEntities = problemRepository.findAll();
+//        List<ProblemEntity> problemEntities = problemRepository.findAll();
+
+        List<ProblemEntity> problemEntities = problemRepository.findProblemsRandom8();
 
         List<Map<String, Object>> result = new ArrayList<>();
 
@@ -214,7 +216,7 @@ public class VitaminService {
 
                     // 국기 기억하기 문제일 때는 ImgUrl key 추가
                     else if (problemEntity.getTrainingName().equals("국기 기억하기")) {
-                        candidate.put("ImgUrl", selectedSubject.getImgUrl());
+                        candidate.put("imgUrl", selectedSubject.getImgUrl());
                     }
 
                     if (count < limit) {
