@@ -130,9 +130,18 @@ public class VitaminService {
             throw new BaseException(INVALID_USERTYPE);
         }
 
-//        List<ProblemEntity> problemEntities = problemRepository.findAll();
+        List<ProblemEntity> problemEntities = new ArrayList<>();
 
-        List<ProblemEntity> problemEntities = problemRepository.findProblemsRandom8();
+        problemEntities.add(problemRepository.findMemoryProblemsRandom());
+        problemEntities.add(problemRepository.findCalculateProblemsRandom());
+        problemEntities.add(problemRepository.findOrientationProblemsRandom());
+        problemEntities.add(problemRepository.findExecutiveProblemsRandom());
+        problemEntities.add(problemRepository.findVisualProblemsRandom());
+        problemEntities.add(problemRepository.findLanguageProblemsRandom());
+        List<ProblemEntity> attentionProblemsRandom = problemRepository.findAttentionProblemsRandom();
+        problemEntities.addAll(attentionProblemsRandom);
+
+        Collections.shuffle(problemEntities);
 
         List<Map<String, Object>> result = new ArrayList<>();
 
