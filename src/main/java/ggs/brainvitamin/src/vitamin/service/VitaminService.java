@@ -807,12 +807,10 @@ public class VitaminService {
 
         // 현재 날짜
         LocalDate nowDate = LocalDate.now();
-
-        // 포맷 정의
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM");
+        int monthValue = nowDate.getMonth().getValue();
 
         // 포맷 적용
-        String currentMonth = nowDate.format(formatter);
+        String currentMonth = String.valueOf(monthValue) + "월";
 
         System.out.println("현재 월 : " + currentMonth);
         System.out.println("오디오 답변 : " + afterStr);
@@ -861,7 +859,7 @@ public class VitaminService {
 
         List<String> weekList = new ArrayList<>(Arrays.asList("월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"));
 
-        String currentWeek = weekList.get(weekValue);
+        String currentWeek = weekList.get(weekValue - 1);
 
         System.out.println("현재 일자 : " + currentWeek);
         System.out.println("오디오 답변 : " + afterStr);
@@ -889,7 +887,7 @@ public class VitaminService {
     }
     private int checkTest6(String text) {
         // 답변에 6973을 포함하면 정답
-        if (text.contains("6 9 7 3")) {
+        if (text.contains("6973")) {
             System.out.println("문제 풀이 성공");
             return 1;
         }
@@ -898,7 +896,7 @@ public class VitaminService {
     }
     private int checkTest7(String text) {
         // 답변에 57284를 포함하면 정답
-        if (text.contains("5 7 2 8 4")) {
+        if (text.contains("57284")) {
             System.out.println("문제 풀이 성공");
             return 1;
         }
