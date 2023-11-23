@@ -14,4 +14,28 @@ public interface ProblemRepository extends JpaRepository<ProblemEntity, Long> {
 
     @Query(value = "SELECT * FROM problem order by RAND() limit 8", nativeQuery = true)
     List<ProblemEntity> findProblemsRandom8();
+
+
+    @Query(value = "select p.* from problem p join problem_category pc on p.category_id = pc.id where pc.area_code = 20 order by rand() limit 1", nativeQuery = true)
+    ProblemEntity findMemoryProblemsRandom();
+
+    @Query(value = "select p.* from problem p join problem_category pc on p.category_id = pc.id where pc.area_code = 21 order by rand() limit 2", nativeQuery = true)
+    List<ProblemEntity> findAttentionProblemsRandom();
+
+    @Query(value = "select p.* from problem p join problem_category pc on p.category_id = pc.id where pc.area_code = 22 order by rand() limit 1", nativeQuery = true)
+    ProblemEntity findVisualProblemsRandom();
+
+    @Query(value = "select p.* from problem p join problem_category pc on p.category_id = pc.id where pc.area_code = 23 order by rand() limit 1", nativeQuery = true)
+    ProblemEntity findLanguageProblemsRandom();
+
+    @Query(value = "select p.* from problem p join problem_category pc on p.category_id = pc.id where pc.area_code = 24 order by rand() limit 1", nativeQuery = true)
+    ProblemEntity findCalculateProblemsRandom();
+
+    @Query(value = "select p.* from problem p join problem_category pc on p.category_id = pc.id where pc.area_code = 25 order by rand() limit 1", nativeQuery = true)
+    ProblemEntity findExecutiveProblemsRandom();
+
+    @Query(value = "select p.* from problem p join problem_category pc on p.category_id = pc.id where pc.area_code = 26 order by rand() limit 1", nativeQuery = true)
+    ProblemEntity findOrientationProblemsRandom();
+
+
 }
