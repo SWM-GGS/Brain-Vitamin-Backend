@@ -214,7 +214,7 @@ public class VitaminService {
                         candidate.put("contents", selectedSubject.getContents());
                     }
 
-                    // 국기 기억하기 문제일 때는 ImgUrl key 추가
+                    // 국기 기억하기 문제일 때는 imgUrl key 추가
                     else if (problemEntity.getTrainingName().equals("국기 기억하기")) {
                         candidate.put("imgUrl", selectedSubject.getImgUrl());
                     }
