@@ -350,7 +350,8 @@ public class VitaminService {
                 break;
 
             case "미로 길찾기":
-                PoolMazeEntity poolMazeEntity = poolMazeRepository.findRandom1ByProblemAndDifficulty(problemEntity.getId(), problemDetailEntity.getDifficulty());
+                // 미로 문제 난이도 1로 고정
+                PoolMazeEntity poolMazeEntity = poolMazeRepository.findRandom1ByProblemAndDifficulty(problemEntity.getId(), 1);
 
                 List<PoolMazeDetailEntity> poolMazeDetailEntities = poolMazeEntity.getPoolMazeDetails();
 
