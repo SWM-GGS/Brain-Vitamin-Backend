@@ -150,7 +150,7 @@ public class VitaminService {
             Map<String, Object> candidate = new HashMap<>();
 
             Random random = new Random();
-            Integer randomDifficulty = random.nextInt(1,4);
+            Integer randomDifficulty = random.nextInt(1,3);
 
             if (problemEntity.getTrainingName().equals("오늘의 날짜 찾기")) {
                 randomDifficulty = 1;
