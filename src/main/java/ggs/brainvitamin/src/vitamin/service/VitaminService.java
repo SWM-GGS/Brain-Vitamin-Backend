@@ -331,8 +331,8 @@ public class VitaminService {
                 for (PoolSfEntity poolSfEntity : poolSfEntities) {
                     Map<String, Object> candidate = new HashMap<>();
 
-                    // 가격 500원 단위로 랜덤 추출
-                    Integer randomPrice = random.nextInt(poolSfEntity.getMinRange()/500, poolSfEntity.getMaxRange()/500 + 1) * 500;
+                    // 가격 1000원 단위로 랜덤 추출
+                    Integer randomPrice = random.nextInt(poolSfEntity.getMinRange()/1000, poolSfEntity.getMaxRange()/1000 + 1) * 1000;
                     Integer randomCount = 1;
 
                     // 난이도가 1이 아닐때는 물품 수량이 1 이상 5이하 값 중 랜덤 추출
