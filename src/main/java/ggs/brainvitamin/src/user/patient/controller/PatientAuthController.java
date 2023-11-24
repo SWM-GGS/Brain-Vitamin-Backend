@@ -169,6 +169,10 @@ public class PatientAuthController {
                     .tokenDto(newTokens)
                     .build();
 
+            FamilyDto familyInfo = patientFamilyService.getFamilyInfo(Long.parseLong(userId));
+            loginResponseDto.getPatientDetailDto().setFamilyKey(familyInfo.getFamilyKey());
+            loginResponseDto.getPatientDetailDto().setFamilyId(familyInfo.getId());
+
             return new BaseResponse<>(loginResponseDto);
 
         } catch (BaseException e) {
