@@ -168,17 +168,13 @@ public class VitaminService {
             if (problemEntity.getTrainingName().equals("시장에서 쇼핑하기")) {
                 if (randomDifficulty == 3) {
                     // 할인율을 [5, 10, 15, ..., 50]에서 랜덤 추출
-                    candidate.put("discountPercent", random.nextInt(1, 11) * 5);
+                    candidate.put("discountPercent", random.nextInt(0, 2) * 50);
                 }
-                else {
-                    candidate.put("discountPercent", 0);
-                }
-
             }
 
             // 기억력 문제 - 몇 단계 이후에 다시 맞추게 할지 추가
             if (problemEntity.getTrainingName().equals("단어 기억하기") ||
-                    problemEntity.getTrainingName().equals("국기 기억하기") ||
+                    problemEntity.getTr정ainingName().equals("국기 기억하기") ||
                     problemEntity.getTrainingName().equals("국기-나라 매칭 기억하기")) {
                 candidate.put("showNext", random.nextInt(0, 4));
             }
@@ -335,8 +331,8 @@ public class VitaminService {
                 for (PoolSfEntity poolSfEntity : poolSfEntities) {
                     Map<String, Object> candidate = new HashMap<>();
 
-                    // 가격 100원 단위로 랜덤 추출
-                    Integer randomPrice = random.nextInt(poolSfEntity.getMinRange()/100, poolSfEntity.getMaxRange()/100 + 1) * 100;
+                    // 가격 500원 단위로 랜덤 추출
+                    Integer randomPrice = random.nextInt(poolSfEntity.getMinRange()/500, poolSfEntity.getMaxRange()/500 + 1) * 500;
                     Integer randomCount = 1;
 
                     // 난이도가 1이 아닐때는 물품 수량이 1 이상 5이하 값 중 랜덤 추출
