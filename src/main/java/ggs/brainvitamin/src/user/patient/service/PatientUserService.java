@@ -459,7 +459,7 @@ public class PatientUserService {
             familyPictureProblemDto.setAnswerIndex(answerIndex);
 
             // 보기 저장
-            String beforeStr1 = familyPictureEntity.getPlace() + "와 비슷한 대한민국 장소 하나를 설명없이 장소명만 알려줘.";
+            String beforeStr1 = familyPictureEntity.getPlace() + "와 비슷한 대한민국 장소 하나를 알려줘. 답변은 \"경복궁\"과 같이 부가 설명 없이 장소 명만 알려줘.";
             float temperature = 0.6f;
 
             Pattern p = Pattern.compile("([가-힣|\s]+)");	// 검색할 문자열 패턴 : 한글, 공백 문자
@@ -472,7 +472,7 @@ public class PatientUserService {
                 afterStr1 = m.group();
             }
 
-            String beforeStr2 = familyPictureEntity.getPlace() + "와 비슷한 대한민국 장소 하나를 설명없이 장소명만 알려줘. 답변에 " + afterStr1 + "는 제외하고 알려줘";
+            String beforeStr2 = familyPictureEntity.getPlace() + "와 비슷한 대한민국 장소 중 " + afterStr1 + "을 제외하고 하나만 알려줘. 답변은 \"경복궁\"과 같이 부가 설명 없이 장소 명만 알려줘.";
 
             // GPT 응답
             String afterStr2 = getGptResponseText(chatService.getChatResponse(beforeStr2, temperature, 500)).trim();
