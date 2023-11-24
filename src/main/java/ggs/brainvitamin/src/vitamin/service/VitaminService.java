@@ -172,6 +172,7 @@ public class VitaminService {
                 }
             }
 
+            // 합쳐진 숫자 찾기 최대 난이도 2로 제한
             if (problemEntity.getTrainingName().equals("합쳐진 숫자 찾기")) {
                 if (randomDifficulty == 3) {
                     candidate.put("difficulty", 2);
