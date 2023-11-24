@@ -1,7 +1,9 @@
 package ggs.brainvitamin.src.vitamin.service;
 
+import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.UserEntity;
+import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.src.vitamin.entity.VitaminAnalyticsEntity;
 import ggs.brainvitamin.src.vitamin.repository.VitaminAnalyticsRepository;
 import ggs.brainvitamin.utils.DateUtil;
@@ -14,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import static ggs.brainvitamin.config.BaseResponseStatus.USERS_EMPTY_USER_ID;
 import static ggs.brainvitamin.src.user.patient.dto.ActivitiesDto.*;
 
 @Service
@@ -21,10 +24,13 @@ import static ggs.brainvitamin.src.user.patient.dto.ActivitiesDto.*;
 public class VitaminAnalyticsService {
 
     private final VitaminAnalyticsRepository vitaminAnalyticsRepository;
+    private final UserRepository userRepository;
 
     public GetWeeklyVitaminDto getWeeklyVitaminAttendance(Long userId, LocalDateTime today) {
 
-        UserEntity userEntity = UserEntity.builder().id(userId).build();
+        // 기존 사용자 프로필 정보 조회
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
 
         LocalDateTime endDate = today;
         LocalDateTime startDate = DateUtil.getDateOfThisMonday(today);
@@ -60,7 +66,9 @@ public class VitaminAnalyticsService {
 
     public GetChangesFromLastWeekDto getChangesFromLastWeek(Long userId, LocalDateTime today) {
 
-        UserEntity userEntity = UserEntity.builder().id(userId).build();
+        // 기존 사용자 프로필 정보 조회
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
 
         // 이번주 월요일부터 오늘까지의 기록 조회
         LocalDateTime endDate = today;
