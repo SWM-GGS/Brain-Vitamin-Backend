@@ -1,7 +1,9 @@
 package ggs.brainvitamin.src.vitamin.service;
 
+import ggs.brainvitamin.config.BaseException;
 import ggs.brainvitamin.config.Status;
 import ggs.brainvitamin.src.user.entity.UserEntity;
+import ggs.brainvitamin.src.user.repository.UserRepository;
 import ggs.brainvitamin.src.vitamin.entity.ScreeningTestHistoryEntity;
 import ggs.brainvitamin.src.vitamin.repository.ScreeningTestHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static ggs.brainvitamin.config.BaseResponseStatus.USERS_EMPTY_USER_ID;
 import static ggs.brainvitamin.src.user.patient.dto.ActivitiesDto.*;
 
 @Service
@@ -20,6 +23,7 @@ import static ggs.brainvitamin.src.user.patient.dto.ActivitiesDto.*;
 public class ScreeningTestHistoryService {
 
     private final ScreeningTestHistoryRepository screeningTestHistoryRepository;
+    private final UserRepository userRepository;
 
     /**
      * 가장 최근 선별검사 기록 조회 함수
@@ -28,10 +32,9 @@ public class ScreeningTestHistoryService {
      */
     public GetScreeningTestHistoryDto getScreeningTestHistory(Long userId) {
 
-        // 선별 검사 기록 조회
-        UserEntity userEntity = UserEntity.builder()
-                .id(userId)
-                .build();
+        // 기존 사용자 프로필 정보 조회
+        UserEntity userEntity = userRepository.findByIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
 
         Optional<ScreeningTestHistoryEntity> historyEntityOptional =
                 screeningTestHistoryRepository.findTop1ByUserAndStatusOrderByCreatedAtDesc(userEntity, Status.ACTIVE);
