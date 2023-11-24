@@ -16,6 +16,7 @@ public class PatientUserDto {
         private String phoneNumber;
         private Integer fontSize;
         private String profileImgUrl;
+        private String education;
         private String familyKey;
         private Long familyId;
     }

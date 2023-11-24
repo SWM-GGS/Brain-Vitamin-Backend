@@ -166,6 +166,7 @@ public class PatientUserService {
                 .phoneNumber(user.getPhoneNumber())
                 .fontSize(user.getFontSize())
                 .profileImgUrl(user.getProfileImgUrl())
+                .education(user.getEducationCode().getCodeDetailName())
                 .build();
     }
 
