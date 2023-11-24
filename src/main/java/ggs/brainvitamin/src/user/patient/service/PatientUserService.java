@@ -106,12 +106,7 @@ public class PatientUserService {
         UserEntity userEntity = userRepository.findById(Long.parseLong(authentication.getName()))
                 .orElseThrow(() -> new BaseException(NOT_ACTIVATED_USER));
 
-        PatientDetailDto patientDetailDto = PatientDetailDto.builder()
-                .id(userEntity.getId())
-                .name(userEntity.getName())
-                .nickname(userEntity.getNickname())
-                .fontSize(userEntity.getFontSize())
-                .build();
+        PatientDetailDto patientDetailDto = getPatientUserDetail(userEntity.getId());
 
         return LoginResponseDto.builder()
                 .patientDetailDto(patientDetailDto)
