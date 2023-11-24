@@ -481,31 +481,31 @@ public class VitaminService {
         if (!memory.getSecond()) {
             memory = Pair.of(-1, false);
         }
-        // 기억력 문제를 풀지 않은 경우
+        // 주의집중력 문제를 풀지 않은 경우
         if (!attention.getSecond()) {
             attention = Pair.of(-1, false);
         }
-        // 기억력 문제를 풀지 않은 경우
+        // 시공간/지남력 문제를 풀지 않은 경우
         if (!orientation.getSecond()) {
             orientation = Pair.of(-1, false);
         }
-        // 기억력 문제를 풀지 않은 경우
+        // 시지각능력 문제를 풀지 않은 경우
         if (!visual.getSecond()) {
             visual = Pair.of(-1, false);
         }
-        // 기억력 문제를 풀지 않은 경우
+        // 언어능력 문제를 풀지 않은 경우
         if (!language.getSecond()) {
             language = Pair.of(-1, false);
         }
-        // 기억력 문제를 풀지 않은 경우
+        // 계산능력 문제를 풀지 않은 경우
         if (!calculation.getSecond()) {
             calculation = Pair.of(-1, false);
         }
-        // 기억력 문제를 풀지 않은 경우
+        // 집행능력 문제를 풀지 않은 경우
         if (!executive.getSecond()) {
             executive = Pair.of(-1, false);
         }
-        // 기억력 문제를 풀지 않은 경우
+        // 소리인지력 문제를 풀지 않은 경우
         if (!sound.getSecond()) {
             sound = Pair.of(-1, false);
         }
@@ -531,7 +531,7 @@ public class VitaminService {
         Integer totalScore = memory.getFirst() + attention.getFirst() + orientation.getFirst() + visual.getFirst() +
                 language.getFirst() + calculation.getFirst() + executive.getFirst() + sound.getFirst();
 
-        String result = "상위 " + (101 - (totalScore * 100 / 70)) + "%";
+        String result = "상위 " + (101 - (totalScore * 100 / 80)) + "%";
         if (totalScore <= 0) {
             result = "상위 99.99%";
         }
